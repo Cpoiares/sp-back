@@ -185,7 +185,7 @@ public class AuctionApiTests : IClassFixture<WebApplicationFactory<Program>>
     public async Task AddVehiclesToAuction_WithValidData_ShouldUpdateAuction()
     {
         // Arrange
-        var auction = await CreateTestAuction(AuctionStatus.Scheduled);
+        var auction = await CreateTestAuction(AuctionStatus.Active);
         var newVehicle = await CreateTestVehicle();
         var request = new AddVehiclesToAuctionRequest
         {

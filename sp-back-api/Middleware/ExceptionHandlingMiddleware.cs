@@ -50,15 +50,9 @@ public class ExceptionHandlingMiddleware
                 response.StatusCode = StatusCodes.Status400BadRequest;
                 errorResponse.Message = validationException.Message;
                 break;
-
-            case AuctionException auctionException:
-                response.StatusCode = StatusCodes.Status400BadRequest;
-                errorResponse.Message = auctionException.Message;
-                break;
-
             default:
                 response.StatusCode = StatusCodes.Status500InternalServerError;
-                errorResponse.Message = "An internal server error occurred.";
+                errorResponse.Message = exception.Message;
                 break;
         }
 

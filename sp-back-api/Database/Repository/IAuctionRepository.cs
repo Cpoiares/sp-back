@@ -8,7 +8,6 @@ public interface IAuctionRepository
     Task<IEnumerable<Auction>> GetActiveAuctionsAsync();
     Task<Auction> GetActiveAuctionByVehicleIdAsync(Guid vehicleId);
     Task<IEnumerable<Auction>> GetCompletedAuctionsAsync();
-    Task<IEnumerable<Auction>> GetScheduledAuctionsAsync();
     Task<IEnumerable<Auction>> GetAuctionsEndingBeforeAsync(DateTime endTime);
     Task<Auction> AddAsync(Auction auction);
     Task<Auction> UpdateAsync(Auction auction);
@@ -16,4 +15,5 @@ public interface IAuctionRepository
     Task<Auction> GetAuctionByNameAsync(string auctionName);
     Task<Bid> AddBidAsync(Bid bid);
 
+    Task<IEnumerable<Auction>> GetAllAuctionsAsync();
 }

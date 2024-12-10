@@ -120,7 +120,8 @@ public class VehicleRepository : IVehicleRepository
     {
         try
         {
-            _context.Entry(vehicle).State = EntityState.Modified;
+            _context.ChangeTracker.Clear();
+            _context.Vehicles.Update(vehicle);
             await _context.SaveChangesAsync();
             return vehicle;
         }

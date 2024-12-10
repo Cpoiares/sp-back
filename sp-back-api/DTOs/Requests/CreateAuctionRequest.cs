@@ -5,7 +5,7 @@ namespace sp_back_api.DTOs;
 public record CreateAuctionRequest
 {
     public string Name { get; init; }
-    public DateTime StartTime { get; init; }
+    public DateTime? StartTime { get; init; }
     public DateTime EndTime { get; init; }
     public string[] VehicleVins { get; init; } = {};
 }
@@ -19,13 +19,6 @@ public class CreateAuctionValidator : AbstractValidator<CreateAuctionRequest>
             .WithMessage("Auction name is required")
             .MaximumLength(100)
             .WithMessage("Auction name cannot exceed 100 characters");
-
-        RuleFor(x => x.StartTime)
-            .NotEmpty()
-            .WithMessage("Start time is required")
-            .Must(startTime => startTime > DateTime.UtcNow)
-            .WithMessage("Start time must be in the future")
-            .When(x => x.StartTime != default);
 
         RuleFor(x => x.EndTime)
             .NotEmpty()

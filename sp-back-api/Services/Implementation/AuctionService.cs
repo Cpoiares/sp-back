@@ -62,13 +62,11 @@ public class AuctionService : IAuctionService
             
             var auction = new Auction
             {
-                Id = Guid.NewGuid(),
                 Name = request.Name,
-                StartTime = request.StartTime.ToUniversalTime(),
+                StartTime = request?.StartTime ?? DateTime.UtcNow,
                 Vehicles = auctionVehicles,
-                EndTime = request.EndTime.ToUniversalTime(),
-                Status = request.StartTime <= DateTime.UtcNow ? 
-                    AuctionStatus.Active : AuctionStatus.Scheduled
+                EndTime = request.EndTime,
+                Status = AuctionStatus.Active
             };
 
             await _vehicleService.LockVehicleInAuction(auctionVehicles);
@@ -258,7 +256,7 @@ public class AuctionService : IAuctionService
         var activeAuctions = await _auctionRepository.GetActiveAuctionsAsync();
         var auction = activeAuctions.Where
             (a => a.Vehicles.Any(v => v.Id == vehicleId) && 
-                           (a.Status == AuctionStatus.Active || a.Status == AuctionStatus.Scheduled));
+                           (a.Status == AuctionStatus.Active));
 
         if (auction == null)
             throw new InvalidOperationException(
@@ -407,6 +405,19 @@ public class AuctionService : IAuctionService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error removing vehicles from auction: {AuctionId}", request.AuctionName);
+            throw;
+        }
+    }
+
+    public async Task<IEnumerable<Auction>> GetAllAuctionsAsync()
+    {
+        try
+        {
+            return await _auctionRepository.GetAllAuctionsAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving active auctions");
             throw;
         }
     }

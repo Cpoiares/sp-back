@@ -7,7 +7,6 @@ namespace sp_back.models.Models.Vehicles;
 public class Vehicle
 {
     public Guid Id { get; set; }
-    
     public virtual Auction.Auction? Auction { get; set; } = null!;
     public uint NumberOfDoors { get; set; }
     public string Make { get; set; }
@@ -19,24 +18,9 @@ public class Vehicle
     public VehicleType Type { get; set; }
     public double StartingPrice { get; set; }
     public double SoldByValue { get; set; }
-    public bool IsAvailable { get; set; } = true ;
+    public bool IsAvailable { get; set; } = true;
     public bool IsSold => !String.IsNullOrEmpty(BuyerId);
     public string? BuyerId { get; set; }
     public Guid? AuctionId { get; set; }
     public string VIN { get; set; }
-
-    public virtual void Validate()
-    {
-        if (string.IsNullOrWhiteSpace(Make))
-            throw new ValidationException("Make is required");
-            
-        if (string.IsNullOrWhiteSpace(Model))
-            throw new ValidationException("Model is required");
-            
-        if (ProductionDate > DateTime.UtcNow)
-            throw new ValidationException("Production date cannot be in the future");
-            
-        if (StartingPrice <= 0)
-            throw new ValidationException("Starting price must be greater than 0");
-    }
 }

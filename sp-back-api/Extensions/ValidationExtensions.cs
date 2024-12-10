@@ -9,6 +9,7 @@ public static class ValidationExtensions
     public static IServiceCollection AddValidators(this IServiceCollection services)
     {
         services.AddValidatorsFromAssemblyContaining<CreateVehicleValidator>();
+        services.AddValidatorsFromAssemblyContaining<CreateAuctionValidator>();
         return services;
     }
 }

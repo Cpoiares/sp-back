@@ -98,7 +98,7 @@ public class AuctionServiceTests : IDisposable
         var request = new CreateAuctionRequest
         {
             Name = "Test Auction",
-            StartTime = DateTime.UtcNow.AddHours(1),
+            StartTime = DateTime.UtcNow,
             EndTime = DateTime.UtcNow.AddDays(1),
             VehicleVins = _testVehicles.Select(v => v.VIN).ToArray()
         };
@@ -109,7 +109,6 @@ public class AuctionServiceTests : IDisposable
         // Assert
         result.Should().NotBeNull();
         result.Name.Should().Be(request.Name);
-        result.Status.Should().Be(AuctionStatus.Scheduled);
         result.Vehicles.Should().HaveCount(2);
         result.Vehicles.Should().Contain(v => _testVehicles.Select(Vehicle => v.Id).Contains(v.Id));
     }

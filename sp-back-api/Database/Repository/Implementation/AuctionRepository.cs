@@ -57,7 +57,7 @@ public class AuctionRepository : IAuctionRepository
             return await _context.Auctions
                 .FirstOrDefaultAsync(a =>
                     (a.Vehicles.Any(v => v.Id == vehicleId) &&
-                     (a.Status == AuctionStatus.Active || a.Status == AuctionStatus.Scheduled)));
+                     (a.Status == AuctionStatus.Active)));
         }
         catch (Exception ex)
         {
@@ -119,27 +119,8 @@ public class AuctionRepository : IAuctionRepository
     {
         try
         {
-            var existingAuction = await _context.Auctions
-                .Include(a => a.Vehicles)
-                .Include(a => a.Bids)
-                .FirstOrDefaultAsync(a => a.Id == auction.Id);
-
-            if (existingAuction == null)
-                throw new NotFoundException($"Auction with ID {auction.Id} not found");
-
-            // Detach existing entity
-            _context.Entry(existingAuction).State = EntityState.Detached;
-
-            // Attach and mark as modified
-            _context.Auctions.Attach(auction);
-            _context.Entry(auction).State = EntityState.Modified;
-
-            // Mark new bids as added
-            foreach (var bid in auction.Bids.Where(b => b.Id == Guid.Empty))
-            {
-                _context.Entry(bid).State = EntityState.Added;
-            }
-
+            _context.ChangeTracker.Clear();
+            _context.Auctions.Update(auction);
             await _context.SaveChangesAsync();
             return auction;
         }
@@ -176,6 +157,21 @@ public class AuctionRepository : IAuctionRepository
         }
     }
 
+    public async Task<IEnumerable<Auction>> GetAllAuctionsAsync()
+    {
+        try
+        {
+            return await _context.Auctions
+                .Include(a => a.Vehicles)
+                .Include(a => a.Bids)
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving completed auctions");
+            throw;
+        }    }
+
     public async Task<Auction> GetAuctionByNameAsync(string auctionName)
     {
         try
@@ -191,22 +187,4 @@ public class AuctionRepository : IAuctionRepository
             throw;
         }    
     }
-    
-
-    public async Task<IEnumerable<Auction>> GetScheduledAuctionsAsync()
-    {
-        try
-        {
-            return await _context.Auctions
-                .Include(a => a.Vehicles)
-                .Where(a => a.Status == AuctionStatus.Scheduled && a.StartTime <= DateTime.UtcNow)
-                .ToListAsync();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error retrieving scheduled auctions");
-            throw;
-        }
-    }
-    
 }

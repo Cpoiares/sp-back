@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Moq;
 using sp_back_api.Database;
@@ -8,6 +7,7 @@ using sp_back_api.DTOs;
 using sp_back_api.Services;
 using sp_back_api.Services.Implementation;
 using sp_back.models.Enums;
+using sp_back.models.Exceptions;
 using sp_back.models.Models.Vehicles;
 using sp_back.tests.Helpers;
 using Xunit;
@@ -158,7 +158,7 @@ public class VehicleServiceTests : IDisposable
         {
             Make = "Ford",
             Model = "F-150",
-            LoadCapacity = -100, // Invalid load capacity
+            LoadCapacity = -100,
             ProductionDate = DateTime.Today.AddMonths(-1),
             Type = VehicleType.Truck,
             StartingPrice = 45000
@@ -170,6 +170,7 @@ public class VehicleServiceTests : IDisposable
         // Assert
         await act.Should().ThrowAsync<sp_back.models.Exceptions.ValidationException>();
     }
+    
 
     [Fact]
     public async Task CreateVehicle_MixedProperties_ShouldThrowValidationException()
@@ -180,7 +181,7 @@ public class VehicleServiceTests : IDisposable
             Make = "Toyota",
             Model = "Camry",
             NumberOfDoors = 4,
-            NumberOfSeats = 5, // Invalid: Sedan shouldn't have seats
+            NumberOfSeats = 5,
             ProductionDate = DateTime.Today.AddMonths(-1),
             Type = VehicleType.Sedan,
             StartingPrice = 25000
@@ -193,6 +194,204 @@ public class VehicleServiceTests : IDisposable
         await act.Should().ThrowAsync<sp_back.models.Exceptions.ValidationException>();
     }
 
+    [Fact]
+    public async Task UpdateVehicle_ValidSedan_ShouldUpdateAndReturnSedan()
+    {
+        // Arrange
+        var vehicle = await CreateTestSedan();
+        var updateDto = new UpdateVehicleRequest
+        {
+            Make = "Updated Toyota",
+            Model = "Updated Camry",
+            NumberOfDoors = 2
+        };
+
+        // Act
+        var result = await _vehicleService.UpdateVehicleAsync(vehicle.Id, updateDto);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType<Sedan>();
+        result.Make.Should().Be(updateDto.Make);
+        result.Model.Should().Be(updateDto.Model);
+        var sedan = (Sedan)result;
+        sedan.NumberOfDoors.Should().Be(updateDto.NumberOfDoors);
+    }
+
+    [Fact]
+    public async Task UpdateVehicle_ValidSUV_ShouldUpdateAndReturnSUV()
+    {
+        // Arrange
+        var vehicle = await CreateTestSUV();
+        var updateDto = new UpdateVehicleRequest
+        {
+            Make = "Updated Honda",
+            NumberOfSeats = 5
+        };
+
+        // Act
+        var result = await _vehicleService.UpdateVehicleAsync(vehicle.Id, updateDto);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType<SUV>();
+        result.Make.Should().Be(updateDto.Make);
+        var suv = (SUV)result;
+        suv.NumberOfSeats.Should().Be(updateDto.NumberOfSeats);
+    }
+
+    [Fact]
+    public async Task UpdateVehicle_ValidTruck_ShouldUpdateAndReturnTruck()
+    {
+        // Arrange
+        var vehicle = await CreateTestTruck();
+        var updateDto = new UpdateVehicleRequest
+        {
+            LoadCapacity = 2000.00
+        };
+
+        // Act
+        var result = await _vehicleService.UpdateVehicleAsync(vehicle.Id, updateDto);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType<Truck>();
+        var truck = (Truck)result;
+        truck.LoadCapacity.Should().Be(updateDto.LoadCapacity);
+    }
+
+    [Fact]
+    public async Task UpdateVehicle_NonExistentId_ShouldThrowNotFoundException()
+    {
+        // Arrange
+        var updateDto = new UpdateVehicleRequest
+        {
+            Make = "Test"
+        };
+
+        // Act
+        var act = () => _vehicleService.UpdateVehicleAsync(Guid.NewGuid(), updateDto);
+
+        // Assert
+        await act.Should().ThrowAsync<NotFoundException>();
+    }
+
+    [Fact]
+    public async Task UpdateVehicle_InvalidTypeChange_ShouldThrowValidationException()
+    {
+        // Arrange
+        var vehicle = await CreateTestSedan();
+        var updateDto = new UpdateVehicleRequest
+        {
+            Type = VehicleType.Truck
+        };
+
+        // Act
+        var act = () => _vehicleService.UpdateVehicleAsync(vehicle.Id, updateDto);
+
+        // Assert
+        await act.Should().ThrowAsync<ValidationException>();
+    }
+    
+    [Fact]
+    public async Task UpdateVehicle_ValidTypeChangeToTruck_ShouldUpdateTypeAndProperties()
+    {
+        // Arrange
+        var vehicle = await CreateTestSedan();
+        var updateDto = new UpdateVehicleRequest
+        {
+            Type = VehicleType.Truck,
+            LoadCapacity = 1500.0,
+            Make = "Ford",
+            Model = "F-150"
+        };
+
+        // Act
+        var result = await _vehicleService.UpdateVehicleAsync(vehicle.Id, updateDto);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType<Truck>();
+        var truck = (Truck)result;
+        truck.LoadCapacity.Should().Be(updateDto.LoadCapacity);
+        truck.Make.Should().Be(updateDto.Make);
+        truck.Model.Should().Be(updateDto.Model);
+        truck.Type.Should().Be(VehicleType.Truck);
+    }
+
+    [Fact]
+    public async Task UpdateVehicle_ValidTypeChangeToSUV_ShouldUpdateTypeAndProperties()
+    {
+        // Arrange
+        var vehicle = await CreateTestSedan();
+        var updateDto = new UpdateVehicleRequest
+        {
+            Type = VehicleType.Suv,
+            NumberOfSeats = 7,
+            Make = "Honda",
+            Model = "CR-V"
+        };
+
+        // Act
+        var result = await _vehicleService.UpdateVehicleAsync(vehicle.Id, updateDto);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType<SUV>();
+        var suv = (SUV)result;
+        suv.NumberOfSeats.Should().Be(updateDto.NumberOfSeats);
+        suv.Make.Should().Be(updateDto.Make);
+        suv.Model.Should().Be(updateDto.Model);
+        suv.Type.Should().Be(VehicleType.Suv);
+    }
+
+    private async Task<Vehicle> CreateTestSedan()
+    {
+        var dto = new CreateVehicleRequest
+        {
+            Make = "Toyota",
+            Model = "Camry",
+            NumberOfDoors = 4,
+            ProductionDate = DateTime.Today.AddMonths(-6),
+            Type = VehicleType.Sedan,
+            StartingPrice = 25000,
+            VIN = "TEST123"
+        };
+
+        return await _vehicleService.CreateVehicleAsync(dto);
+    }
+
+    private async Task<Vehicle> CreateTestSUV()
+    {
+        var dto = new CreateVehicleRequest
+        {
+            Make = "Honda",
+            Model = "CR-V",
+            NumberOfSeats = 7,
+            ProductionDate = DateTime.Today.AddMonths(-3),
+            Type = VehicleType.Suv,
+            StartingPrice = 35000,
+            VIN = "TEST456"
+        };
+
+        return await _vehicleService.CreateVehicleAsync(dto);
+    }
+
+    private async Task<Vehicle> CreateTestTruck()
+    {
+        var dto = new CreateVehicleRequest
+        {
+            Make = "Ford",
+            Model = "F-150",
+            LoadCapacity = 1500.5,
+            ProductionDate = DateTime.Today.AddMonths(-1),
+            Type = VehicleType.Truck,
+            StartingPrice = 45000,
+            VIN = "TEST789"
+        };
+
+        return await _vehicleService.CreateVehicleAsync(dto);
+    }
     public void Dispose()
     {
         _context.Database.EnsureDeleted();

@@ -36,8 +36,7 @@ public class AuctionDbContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.Property(e => e.Name)
-                .IsRequired()
-                .HasMaxLength(100);
+                .IsRequired();
 
             entity.Property(e => e.StartTime)
                 .IsRequired();
@@ -186,9 +185,9 @@ public class AuctionDbContext : DbContext
             {
                 Id = Guid.Parse("9d2e6f0e-b5a2-4c8f-b3e4-3f2e6a3b123c"),
                 Name = "Upcoming Auction",
-                StartTime = DateTime.UtcNow.AddDays(1),
+                StartTime = DateTime.UtcNow,
                 EndTime = DateTime.UtcNow.AddDays(6),
-                Status = AuctionStatus.Scheduled,
+                Status = AuctionStatus.Active,
 
             }
         };
