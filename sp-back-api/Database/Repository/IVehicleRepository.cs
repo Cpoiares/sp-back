@@ -12,4 +12,5 @@ public interface IVehicleRepository
     Task<Vehicle> AddAsync(Vehicle vehicle);
     Task<Vehicle> UpdateAsync(Vehicle vehicle);
     Task DeleteAsync(Guid id);
+    bool CheckIfVinExists(string requestVin);
 }

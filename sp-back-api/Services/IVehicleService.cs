@@ -7,9 +7,9 @@ namespace sp_back_api.Services;
 public interface IVehicleService
 {
     Task<Vehicle> CreateVehicleAsync(CreateVehicleRequest request);
-    Task<Vehicle> UpdateVehicleAsync(Guid id, UpdateVehicleRequest request);
+    Task<Vehicle> UpdateVehicleAsync(UpdateVehicleRequest request);
     Task<Vehicle> GetVehicleAsync(Guid id);
     Task<IEnumerable<Vehicle>> SearchVehiclesAsync(VehicleSearchParams searchParams);
     Task LockVehicleInAuction(List<Vehicle> vehicles);
-    Task DeleteVehicleAsync(Guid id);
+    Task DeleteVehicleAsync(DeleteVehicleRequest request);
 }

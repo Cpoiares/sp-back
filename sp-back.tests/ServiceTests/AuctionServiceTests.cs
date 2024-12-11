@@ -58,7 +58,7 @@ public class AuctionServiceTests : IDisposable
     {
         var vehicles = new List<Vehicle>
         {
-            new Vehicle
+            new()
             {
                 Id = Guid.NewGuid(),
                 Make = "Test1",
@@ -71,7 +71,7 @@ public class AuctionServiceTests : IDisposable
                 VIN = "1"
                 
             },
-            new Vehicle
+            new()
             {
                 Id = Guid.NewGuid(),
                 Make = "Test2",
@@ -125,6 +125,13 @@ public class AuctionServiceTests : IDisposable
             VehicleVins = _testVehicles.Select(v => v.VIN).ToArray()
         };
 
+        var existingAuctions = await _context.Auctions.ToListAsync();
+        Console.WriteLine($"Existing auctions before test: {existingAuctions.Count}");
+        foreach (var auction in existingAuctions)
+        {
+            Console.WriteLine($"Auction ID: {auction.Id}");
+        }
+        
         // Act
         var result = await _auctionService.CreateAuctionAsync(request);
 
@@ -409,13 +416,15 @@ public class AuctionServiceTests : IDisposable
             await _context.SaveChangesAsync();
         }
         
-        auction.Vehicles = vehicles;
+        auction.Vehicles = await _context.Vehicles
+            .Where(v => _testVehicles.Select(tv => tv.Id).Contains(v.Id))
+            .ToListAsync();
 
         _context.Auctions.Add(auction);
         await _context.SaveChangesAsync();
 
         // Clear tracker to ensure clean state
-        _context.ChangeTracker.Clear();
+        // _context.ChangeTracker.Clear();
 
         // Reload auction with its relationships
         auction = await _context.Auctions
@@ -438,7 +447,7 @@ public class AuctionServiceTests : IDisposable
         await _context.SaveChangesAsync();
 
         // Clear tracker again and return fresh instance
-        _context.ChangeTracker.Clear();
+        // _context.ChangeTracker.Clear();
     
         return await _context.Auctions
             .Include(a => a.Vehicles)
@@ -460,7 +469,7 @@ public class AuctionServiceTests : IDisposable
 
         _context.Auctions.Add(auction);
         await _context.SaveChangesAsync();
-        _context.ChangeTracker.Clear();
+        // _context.ChangeTracker.Clear();
         return auction;
     }
 

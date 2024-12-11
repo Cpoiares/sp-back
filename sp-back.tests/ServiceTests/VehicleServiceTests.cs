@@ -201,13 +201,14 @@ public class VehicleServiceTests : IDisposable
         var vehicle = await CreateTestSedan();
         var updateDto = new UpdateVehicleRequest
         {
+            Id = vehicle.Id,
             Make = "Updated Toyota",
             Model = "Updated Camry",
             NumberOfDoors = 2
         };
 
         // Act
-        var result = await _vehicleService.UpdateVehicleAsync(vehicle.Id, updateDto);
+        var result = await _vehicleService.UpdateVehicleAsync(updateDto);
 
         // Assert
         result.Should().NotBeNull();
@@ -225,12 +226,13 @@ public class VehicleServiceTests : IDisposable
         var vehicle = await CreateTestSUV();
         var updateDto = new UpdateVehicleRequest
         {
+            Id = vehicle.Id,
             Make = "Updated Honda",
             NumberOfSeats = 5
         };
 
         // Act
-        var result = await _vehicleService.UpdateVehicleAsync(vehicle.Id, updateDto);
+        var result = await _vehicleService.UpdateVehicleAsync(updateDto);
 
         // Assert
         result.Should().NotBeNull();
@@ -247,11 +249,12 @@ public class VehicleServiceTests : IDisposable
         var vehicle = await CreateTestTruck();
         var updateDto = new UpdateVehicleRequest
         {
+            Id = vehicle.Id,
             LoadCapacity = 2000.00
         };
 
         // Act
-        var result = await _vehicleService.UpdateVehicleAsync(vehicle.Id, updateDto);
+        var result = await _vehicleService.UpdateVehicleAsync(updateDto);
 
         // Assert
         result.Should().NotBeNull();
@@ -266,11 +269,12 @@ public class VehicleServiceTests : IDisposable
         // Arrange
         var updateDto = new UpdateVehicleRequest
         {
+            Id = Guid.NewGuid(),
             Make = "Test"
         };
 
         // Act
-        var act = () => _vehicleService.UpdateVehicleAsync(Guid.NewGuid(), updateDto);
+        var act = () => _vehicleService.UpdateVehicleAsync(updateDto);
 
         // Assert
         await act.Should().ThrowAsync<NotFoundException>();
@@ -283,11 +287,12 @@ public class VehicleServiceTests : IDisposable
         var vehicle = await CreateTestSedan();
         var updateDto = new UpdateVehicleRequest
         {
+            Id = vehicle.Id,
             Type = VehicleType.Truck
         };
 
         // Act
-        var act = () => _vehicleService.UpdateVehicleAsync(vehicle.Id, updateDto);
+        var act = () => _vehicleService.UpdateVehicleAsync(updateDto);
 
         // Assert
         await act.Should().ThrowAsync<ValidationException>();
@@ -300,6 +305,7 @@ public class VehicleServiceTests : IDisposable
         var vehicle = await CreateTestSedan();
         var updateDto = new UpdateVehicleRequest
         {
+            Id = vehicle.Id,
             Type = VehicleType.Truck,
             LoadCapacity = 1500.0,
             Make = "Ford",
@@ -307,7 +313,7 @@ public class VehicleServiceTests : IDisposable
         };
 
         // Act
-        var result = await _vehicleService.UpdateVehicleAsync(vehicle.Id, updateDto);
+        var result = await _vehicleService.UpdateVehicleAsync(updateDto);
 
         // Assert
         result.Should().NotBeNull();
@@ -326,6 +332,7 @@ public class VehicleServiceTests : IDisposable
         var vehicle = await CreateTestSedan();
         var updateDto = new UpdateVehicleRequest
         {
+            Id = vehicle.Id,
             Type = VehicleType.Suv,
             NumberOfSeats = 7,
             Make = "Honda",
@@ -333,7 +340,7 @@ public class VehicleServiceTests : IDisposable
         };
 
         // Act
-        var result = await _vehicleService.UpdateVehicleAsync(vehicle.Id, updateDto);
+        var result = await _vehicleService.UpdateVehicleAsync(updateDto);
 
         // Assert
         result.Should().NotBeNull();

@@ -26,7 +26,10 @@ public class VehicleService : IVehicleService
         try
         {
             ValidateVehicleDto(request);
-
+            
+            if (CheckVehicleVin(request.VIN))
+                throw new ValidationException("Vin already exists in database");
+            
             Vehicle vehicle = request.Type switch
             {
                 VehicleType.Suv when (request.NumberOfSeats != 0 
@@ -93,12 +96,12 @@ public class VehicleService : IVehicleService
             throw;
         }
     }
-    public async Task<Vehicle> UpdateVehicleAsync(Guid id, UpdateVehicleRequest request)
+    public async Task<Vehicle> UpdateVehicleAsync(UpdateVehicleRequest request)
     {
         try
         {
-            var existingVehicle = await _vehicleRepository.GetByIdAsync(id)
-                ?? throw new NotFoundException($"Vehicle with ID {id} not found");
+            var existingVehicle = await _vehicleRepository.GetByIdAsync(request.Id)
+                ?? throw new NotFoundException($"Vehicle with ID {request.Id} not found");
 
             if (!existingVehicle.IsAvailable)
                 throw new InvalidOperationException("Cannot update vehicle that is in auction");
@@ -108,9 +111,9 @@ public class VehicleService : IVehicleService
             {
                 Vehicle updatedVehicle = request.Type switch
                 {
-                    VehicleType.Suv when (request.NumberOfSeats.HasValue && request.NumberOfSeats != 0
-                                        && (!request.NumberOfDoors.HasValue || request.NumberOfDoors == 0)
-                                        && (!request.LoadCapacity.HasValue || request.LoadCapacity == 0)) 
+                    VehicleType.Suv when (request.NumberOfSeats is not null and not 0
+                                        && request.NumberOfDoors is null or 0
+                                        && request.LoadCapacity is null or 0) 
                         => new SUV
                         {
                             Id = existingVehicle.Id,
@@ -124,7 +127,7 @@ public class VehicleService : IVehicleService
                             IsAvailable = existingVehicle.IsAvailable
                         },
 
-                    VehicleType.Hatchback when (request.NumberOfDoors.HasValue && request.NumberOfDoors != 0
+                    VehicleType.Hatchback when (request.NumberOfDoors is not null and not 0
                                             && request.NumberOfSeats is null or 0
                                             && request.LoadCapacity is null or 0)
                         => new Hatchback
@@ -140,7 +143,7 @@ public class VehicleService : IVehicleService
                             IsAvailable = existingVehicle.IsAvailable
                         },
 
-                    VehicleType.Sedan when (request.NumberOfDoors.HasValue && request.NumberOfDoors != 0
+                    VehicleType.Sedan when (request.NumberOfDoors is not null and not 0
                                         && request.NumberOfSeats is null or 0
                                         && request.LoadCapacity is null or 0)
                         => new Sedan
@@ -156,9 +159,9 @@ public class VehicleService : IVehicleService
                             IsAvailable = existingVehicle.IsAvailable
                         },
 
-                    VehicleType.Truck when (request.LoadCapacity.HasValue && request.LoadCapacity != 0
-                                        && (!request.NumberOfSeats.HasValue || request.NumberOfSeats == 0)
-                                        && (!request.NumberOfDoors.HasValue || request.NumberOfDoors == 0))
+                    VehicleType.Truck when (request.LoadCapacity is not null and not 0
+                                        && request.NumberOfSeats is null or 0
+                                        && request.NumberOfDoors is null or 0)
                         => new Truck
                         {
                             Id = existingVehicle.Id,
@@ -180,15 +183,17 @@ public class VehicleService : IVehicleService
 
             switch (existingVehicle.Type)
             {
-                case VehicleType.Suv when request.NumberOfDoors.HasValue || request.LoadCapacity.HasValue:
-                    throw new ValidationException("Cannot add doors or load capacity to SUV");
+                case VehicleType.Suv when request.NumberOfDoors is not null and not 0 || request.LoadCapacity is not null and not 0:
+                    throw new ValidationException("Cannot add doors or load capacity to a SUV");
                     
-                case VehicleType.Sedan when request.NumberOfSeats.HasValue || request.LoadCapacity.HasValue:
-                case VehicleType.Hatchback when request.NumberOfSeats.HasValue || request.LoadCapacity.HasValue:
-                    throw new ValidationException("Cannot add seats or load capacity to Hatchback");
+                case VehicleType.Sedan when request.NumberOfSeats is not null and not 0 || request.LoadCapacity is not null and not 0:
+                    throw new ValidationException("Cannot add seats or load capacity to a Sedan");
+
+                case VehicleType.Hatchback when request.NumberOfSeats is not null and not 0 || request.LoadCapacity is not null and not 0:
+                    throw new ValidationException("Cannot add seats or load capacity to a Hatchback");
                     
-                case VehicleType.Truck when request.NumberOfDoors.HasValue || request.NumberOfSeats.HasValue:
-                    throw new ValidationException("Cannot add doors or seats to Truck");
+                case VehicleType.Truck when request.NumberOfDoors is not null and not 0 || request.NumberOfSeats is not null and not 0:
+                    throw new ValidationException("Cannot add doors or seats to a Truck");
             }
 
             existingVehicle.VIN = request.VIN ?? existingVehicle.VIN;
@@ -221,7 +226,7 @@ public class VehicleService : IVehicleService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating vehicle: {Id}", id);
+            _logger.LogError(ex, "Error updating vehicle: {Id}", request.Id);
             throw;
         }
     }
@@ -281,21 +286,21 @@ public class VehicleService : IVehicleService
         }
     }
 
-    public async Task DeleteVehicleAsync(Guid id)
+    public async Task DeleteVehicleAsync(DeleteVehicleRequest request)
     {
         try
         {
-            var vehicle = await _vehicleRepository.GetByIdAsync(id)
-                ?? throw new NotFoundException($"Vehicle with ID {id} not found");
+            var vehicle = await _vehicleRepository.GetByIdAsync(request.Id)
+                ?? throw new NotFoundException($"Vehicle with ID {request.Id} not found");
 
             if (!vehicle.IsAvailable)
                 throw new InvalidOperationException("Cannot delete vehicle that is in auction");
 
-            await _vehicleRepository.DeleteAsync(id);
+            await _vehicleRepository.DeleteAsync(request.Id);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error deleting vehicle: {Id}", id);
+            _logger.LogError(ex, "Error deleting vehicle: {Id}", request.Id);
             throw;
         }
     }
@@ -309,7 +314,7 @@ public class VehicleService : IVehicleService
         }
     }
 
-    private void ValidateVehicleDto(CreateVehicleRequest request)
+    private async void ValidateVehicleDto(CreateVehicleRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Make))
             throw new ValidationException("Make is required");
@@ -319,5 +324,10 @@ public class VehicleService : IVehicleService
 
         if (request.StartingPrice <= 0)
             throw new ValidationException("Starting price must be greater than 0");
+    }
+
+    private bool CheckVehicleVin(string requestVin)
+    {
+        return _vehicleRepository.CheckIfVinExists(requestVin);
     }
 }

@@ -327,8 +327,10 @@ public class AuctionService : IAuctionService
         {
             var auction = await _auctionRepository.GetAuctionByNameAsync(request.AuctionName)
                           ?? throw new NotFoundException($"Auction with name {request.AuctionName} not found");
-
-            // Get all vehicles requested
+            
+            if (auction.Status != AuctionStatus.Active)
+                throw new InvalidOperationException("Can only add vehicles to active auctions");
+            
             var vehiclesToAdd = new List<Vehicle>();
             foreach (var vin in request.VehicleVins)
             {
@@ -344,7 +346,6 @@ public class AuctionService : IAuctionService
                 vehiclesToAdd.Add(vehicle);
             }
 
-            // Mark vehicles as unavailable and add to auction
             foreach (var vehicle in vehiclesToAdd)
             {
                 vehicle.IsAvailable = false;
@@ -371,6 +372,9 @@ public class AuctionService : IAuctionService
         {
             var auction = await _auctionRepository.GetAuctionByNameAsync(request.AuctionName)
                           ?? throw new NotFoundException($"Auction with name {request.AuctionName} not found");
+            
+            if (auction.Status != AuctionStatus.Active)
+                throw new InvalidOperationException("Can only remove vehicles from active auctions");
             
             // Verify all vehicles exist in the auction
             foreach (var vehicleVin in request.VehicleVins)

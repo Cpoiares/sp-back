@@ -149,4 +149,9 @@ public class VehicleRepository : IVehicleRepository
             throw;
         }
     }
+
+    public bool CheckIfVinExists(string requestVin)
+    {
+        return _context.Vehicles.Any(v => v.VIN == requestVin);
+    }
 }
