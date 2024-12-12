@@ -106,8 +106,8 @@ public class VehicleServiceTests : IDisposable
 
         // Assert
         result.Should().NotBeNull();
-        result.Should().BeOfType<SUV>();
-        var suv = (SUV)result;
+        result.Should().BeOfType<Suv>();
+        var suv = (Suv)result;
         suv.NumberOfSeats.Should().Be(dto.NumberOfSeats);
         result.Make.Should().Be(dto.Make);
         result.Model.Should().Be(dto.Model);
@@ -236,9 +236,9 @@ public class VehicleServiceTests : IDisposable
 
         // Assert
         result.Should().NotBeNull();
-        result.Should().BeOfType<SUV>();
+        result.Should().BeOfType<Suv>();
         result.Make.Should().Be(updateDto.Make);
-        var suv = (SUV)result;
+        var suv = (Suv)result;
         suv.NumberOfSeats.Should().Be(updateDto.NumberOfSeats);
     }
 
@@ -344,8 +344,8 @@ public class VehicleServiceTests : IDisposable
 
         // Assert
         result.Should().NotBeNull();
-        result.Should().BeOfType<SUV>();
-        var suv = (SUV)result;
+        result.Should().BeOfType<Suv>();
+        var suv = (Suv)result;
         suv.NumberOfSeats.Should().Be(updateDto.NumberOfSeats);
         suv.Make.Should().Be(updateDto.Make);
         suv.Model.Should().Be(updateDto.Model);

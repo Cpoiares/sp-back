@@ -3,6 +3,7 @@
 public enum AuctionStatus
 {
     Active,
+    Waiting,
     Completed,
     Cancelled
 }

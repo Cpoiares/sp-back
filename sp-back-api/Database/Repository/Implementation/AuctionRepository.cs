@@ -119,7 +119,6 @@ public class AuctionRepository : IAuctionRepository
     {
         try
         {
-            _context.ChangeTracker.Clear();
             _context.Auctions.Update(auction);
             await _context.SaveChangesAsync();
             return auction;
@@ -172,6 +171,42 @@ public class AuctionRepository : IAuctionRepository
             throw;
         }    }
 
+    public async Task<Auction> StartAuction(string auctionName)
+    {
+        try
+        {
+            var auction = _context.Auctions.FirstOrDefault(a => a.Name == auctionName);
+            auction.Status = AuctionStatus.Active;
+            auction.StartTime = DateTime.Now;
+            _context.Auctions.Update(auction);
+            await _context.SaveChangesAsync();
+            return auction;  
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error trying to start auction with name: {auctionName}", auctionName);
+            throw;
+        }
+  
+    }
+
+    public Task CloseAuctionAsync(Guid auctionId)
+    {
+        try
+        {
+            var auction = _context.Auctions.FirstOrDefault(a => a.Id == auctionId);
+            auction.Status = AuctionStatus.Completed;
+            auction.EndTime = DateTime.Now;
+            _context.Auctions.Update(auction);
+            return _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error closing auction with id: {auctionId}", auctionId);
+            throw;
+        }
+    }
+
     public async Task<Auction> GetAuctionByNameAsync(string auctionName)
     {
         try
@@ -179,7 +214,7 @@ public class AuctionRepository : IAuctionRepository
             return await _context.Auctions
                 .Include(a => a.Vehicles)
                 .Include(a => a.Bids)
-                .FirstOrDefaultAsync(a => a.Name == auctionName);
+                .FirstAsync(a => a.Name == auctionName);
         }
         catch (Exception ex)
         {

@@ -64,8 +64,8 @@ public class VehicleRepository : IVehicleRepository
         {
             var query = _context.Vehicles.AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(searchParams.Make))
-                query = query.Where(v => v.Make.Contains(searchParams.Make));
+            if (!string.IsNullOrWhiteSpace(searchParams.Manufacturer))
+                query = query.Where(v => v.Make.Contains(searchParams.Manufacturer));
             
             if (!string.IsNullOrWhiteSpace(searchParams.Model))
                 query = query.Where(v => v.Model.Contains(searchParams.Model));
@@ -73,24 +73,11 @@ public class VehicleRepository : IVehicleRepository
             if (searchParams.Type.HasValue)
                 query = query.Where(v => v.Type == searchParams.Type.Value);
             
-            if (searchParams.IsAvailable.HasValue)
-                query = query.Where(v => v.IsAvailable == searchParams.IsAvailable.Value);
+            if (searchParams.YearFrom.HasValue)
+                query = query.Where(v => v.ProductionDate.Year >= searchParams.YearFrom.Value);
             
-            if (searchParams.NumberOfDoors.HasValue)
-                query = query.Where(v => v.NumberOfDoors >= searchParams.NumberOfDoors.Value);
-            
-            if (searchParams.NumberOfSeats.HasValue)
-                query = query.Where(v => v.NumberOfSeats >= searchParams.NumberOfSeats.Value);
-            
-            if (searchParams.LoadCapacity.HasValue)
-                query = query.Where(v => v.LoadCapacity >= searchParams.LoadCapacity.Value);
-            
-            // Apply pagination if specified
-            if (searchParams.Page.HasValue && searchParams.PageSize.HasValue)
-            {
-                int skip = (searchParams.Page.Value - 1) * searchParams.PageSize.Value;
-                query = query.Skip(skip).Take(searchParams.PageSize.Value);
-            }
+            if (searchParams.YearTo.HasValue)
+                query = query.Where(v => v.ProductionDate.Year <= searchParams.YearTo.Value);
 
             return await query.ToListAsync();
         }
@@ -120,8 +107,14 @@ public class VehicleRepository : IVehicleRepository
     {
         try
         {
-            _context.ChangeTracker.Clear();
-            _context.Vehicles.Update(vehicle);
+            var existing = await _context.Vehicles.FindAsync(vehicle.Id);
+            if (existing == null)
+                throw new NotFoundException($"Vehicle with ID {vehicle.Id} not found");
+
+            _context.Vehicles.Remove(existing);
+            await _context.SaveChangesAsync();  
+            
+            _context.Vehicles.Add(vehicle);
             await _context.SaveChangesAsync();
             return vehicle;
         }
@@ -136,7 +129,7 @@ public class VehicleRepository : IVehicleRepository
     {
         try
         {
-            var vehicle = await GetByIdAsync(id);
+            var vehicle = await _context.Vehicles.FindAsync(id);
             if (vehicle != null)
             {
                 _context.Vehicles.Remove(vehicle);
@@ -153,5 +146,22 @@ public class VehicleRepository : IVehicleRepository
     public bool CheckIfVinExists(string requestVin)
     {
         return _context.Vehicles.Any(v => v.VIN == requestVin);
+    }
+
+    public Task MarkVehicleAsSold(Guid vehicleId, string buyerId)
+    {
+        try
+        {
+            var vehicle = _context.Vehicles.Find(vehicleId);
+            vehicle.BuyerId = buyerId;
+            _context.Vehicles.Update(vehicle);
+            return _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error marking vehicle as sold for ID: {Id}", vehicleId);
+            throw;
+        }
+        
     }
 }

@@ -110,8 +110,6 @@ public class AuctionApiTests : IClassFixture<WebApplicationFactory<Program>>
         var request = new CreateAuctionRequest
         {
             Name = "Test Auction",
-            StartTime = DateTime.UtcNow.AddHours(1),
-            EndTime = DateTime.UtcNow.AddDays(1),
             VehicleVins = new[] { vehicle.VIN }
         };
 
@@ -234,9 +232,6 @@ public class AuctionApiTests : IClassFixture<WebApplicationFactory<Program>>
         {
             
             Name = "Test Auction",
-            StartTime = status == AuctionStatus.Active ? 
-                DateTime.UtcNow.AddHours(-1) : DateTime.UtcNow.AddHours(1),
-            EndTime = DateTime.UtcNow.AddDays(1),
             VehicleVins = new[] { vehicle.VIN }
         };
 

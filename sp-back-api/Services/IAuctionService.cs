@@ -15,4 +15,6 @@ public interface IAuctionService
     Task<Auction?> AddVehiclesToAuctionAsync(AddVehiclesToAuctionRequest request);
     Task<Auction?> RemoveVehiclesFromAuctionAsync(RemoveVehiclesFromAuctionRequest request);
     Task<IEnumerable<Auction>> GetAllAuctionsAsync();
+    Task<Auction> StartAuctionAsync(string auctionName);
+
 }

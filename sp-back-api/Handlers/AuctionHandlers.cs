@@ -5,6 +5,7 @@ using sp_back_api.DTOs;
 using sp_back_api.DTOs.Responses;
 using sp_back_api.Extensions;
 using sp_back_api.Services;
+using sp_back.models.DTOs.Requests;
 
 namespace sp_back_api.Handlers;
 
@@ -91,6 +92,13 @@ public static class AuctionHandlers
         IAuctionService auctionService)
     {
         var auction = await auctionService.CloseAuctionAsync(request.AuctionName);
-        return Results.Ok(AuctionResponseHandler.BuildResponse(auction));
+        return Results.Ok(AuctionResponseHandler.BuildCloseResponse(auction));
     }
-}
+
+    public static async Task<IResult> StartAuction(
+        [FromBody] StartAuctionRequest request, 
+        IAuctionService auctionService)
+    {
+        var auction = await auctionService.StartAuctionAsync(request.AuctionName);
+        return Results.Ok(AuctionResponseHandler.BuildStartResponse(auction));
+    }}

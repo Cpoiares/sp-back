@@ -7,7 +7,7 @@ public class Bid : IComparable<Bid>
     public Guid Id { get; set; }
     public string BidderId { get; set; }
     public double Amount { get; set; }
-    public DateTime BidTime { get; set; }
+    public DateTime? BidTime { get; set; }
     public Guid AuctionId { get; set; }
     public Vehicle Vehicle { get; set; }
     public Guid VehicleId { get; set; }

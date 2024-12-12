@@ -32,7 +32,8 @@ public class AuctionLogger : IAuctionLogger
                     vehicle.Make,
                     vehicle.Model,
                     vehicle.Year,
-                    vehicle.Type
+                    vehicle.Type,
+                    vehicle.StartingPrice
                 },
                 WinningBid = auction.GetHighestBidForVehicle(vehicle.Id)?.Amount,
                 WinningBidder = auction.GetHighestBidderForVehicle(vehicle.Id)

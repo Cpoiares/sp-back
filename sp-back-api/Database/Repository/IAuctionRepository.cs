@@ -16,4 +16,6 @@ public interface IAuctionRepository
     Task<Bid> AddBidAsync(Bid bid);
 
     Task<IEnumerable<Auction>> GetAllAuctionsAsync();
+    Task<Auction> StartAuction(string auctionName);
+    Task CloseAuctionAsync(Guid auctionId);
 }

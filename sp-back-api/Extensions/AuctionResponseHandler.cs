@@ -14,13 +14,48 @@ public static class AuctionResponseHandler
             Vehicles = auction.Vehicles.Select(v =>  new AuctionVehicles()
             {
                 VIN = v.VIN,
-                Name = $"{v.Make}{v.Model}",
-                CurrentBid = auction.GetHighestBidForVehicle(v.Id).Amount,
+                Name = $"{v.Make} {v.Model}",
+                VehicleStartingPrice = v.StartingPrice,
+                WinningBid = auction.GetHighestBidForVehicle(v.Id).Amount,
                 BidderId = auction.GetHighestBidderForVehicle(v.Id)
             }).ToList(),
             StartTime = auction.StartTime,
             EndTime = auction.EndTime,
             Status = auction.Status,
+        };
+    }
+    
+    public static StartAuctionResponse BuildStartResponse(Auction auction)
+    {
+        return new StartAuctionResponse()
+        {
+            AuctionName = auction.Name,
+            Vehicles = auction.Vehicles.Select(v =>  new AuctionVehicles()
+            {
+                VIN = v.VIN,
+                Name = $"{v.Make}{v.Model}",
+                VehicleStartingPrice = v.StartingPrice,
+                WinningBid = auction.GetHighestBidForVehicle(v.Id).Amount,
+                BidderId = auction.GetHighestBidderForVehicle(v.Id)
+            }).ToList(),
+            StartDate = auction?.StartTime ?? DateTime.UtcNow,
+        };
+    }
+    
+    public static CloseAuctionResponse BuildCloseResponse(Auction auction)
+    {
+        return new CloseAuctionResponse()
+        {
+            AuctionName = auction.Name,
+            Vehicles = auction.Vehicles.Select(v =>  new AuctionVehicles()
+            {
+                VIN = v.VIN,
+                Name = $"{v.Make}{v.Model}",
+                VehicleStartingPrice = v.StartingPrice,
+                WinningBid = auction.GetHighestBidForVehicle(v.Id).Amount,
+                BidderId = auction.GetHighestBidderForVehicle(v.Id)
+            }).ToList(),
+            EndDate = auction.EndTime ?? DateTime.UtcNow,
         };
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using sp_back_api.DTOs;
+using sp_back_api.Extensions;
 using sp_back_api.Services;
 using sp_back.models.Models;
 
@@ -14,7 +15,12 @@ public static class VehicleHandlers
         IVehicleService vehicleService)
     {
         var vehicles = await vehicleService.SearchVehiclesAsync(searchParams);
-        return Results.Ok(vehicles);
+
+        var response = new GetAllVehiclesResponse
+        {
+            Vehicles = vehicles.Select(v => v.GetVehicleResponses()).ToList()
+        };
+        return Results.Ok(response);
     }
 
     public static async Task<IResult> GetVehicleById(
@@ -22,7 +28,7 @@ public static class VehicleHandlers
         IVehicleService vehicleService)
     {
         var vehicle = await vehicleService.GetVehicleAsync(id);
-        return vehicle is null ? Results.NotFound() : Results.Ok(vehicle);
+        return vehicle is null ? Results.NotFound() : Results.Ok(vehicle.GetVehicleResponses());
     }
 
     public static async Task<IResult> CreateVehicle(
@@ -36,7 +42,7 @@ public static class VehicleHandlers
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
         var vehicle = await vehicleService.CreateVehicleAsync(request);
-        return Results.Created($"/vehicles/{vehicle.Id}", vehicle);
+        return Results.Created($"/vehicles/{vehicle.Id}", vehicle.GetVehicleResponses());
     }
 
     public static async Task<IResult> UpdateVehicle(
@@ -44,7 +50,7 @@ public static class VehicleHandlers
         IVehicleService vehicleService)
     {
         var vehicle = await vehicleService.UpdateVehicleAsync(request);
-        return Results.Ok(vehicle);
+        return Results.Ok(vehicle.GetVehicleResponses());
     }
 
     public static async Task<IResult> DeleteVehicle(

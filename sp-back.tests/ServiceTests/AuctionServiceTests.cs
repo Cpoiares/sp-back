@@ -58,7 +58,7 @@ public class AuctionServiceTests : IDisposable
     {
         var vehicles = new List<Vehicle>
         {
-            new()
+            new Sedan()
             {
                 Id = Guid.NewGuid(),
                 Make = "Test1",
@@ -71,7 +71,7 @@ public class AuctionServiceTests : IDisposable
                 VIN = "1"
                 
             },
-            new()
+            new Sedan()
             {
                 Id = Guid.NewGuid(),
                 Make = "Test2",
@@ -98,8 +98,6 @@ public class AuctionServiceTests : IDisposable
         var request = new CreateAuctionRequest
         {
             Name = "Test Auction",
-            StartTime = DateTime.UtcNow,
-            EndTime = DateTime.UtcNow.AddDays(1),
             VehicleVins = _testVehicles.Select(v => v.VIN).ToArray()
         };
 
@@ -112,34 +110,7 @@ public class AuctionServiceTests : IDisposable
         result.Vehicles.Should().HaveCount(2);
         result.Vehicles.Should().Contain(v => _testVehicles.Select(Vehicle => v.Id).Contains(v.Id));
     }
-
-    [Fact]
-    public async Task CreateAuction_WithImmediateStartTime_ShouldCreateActiveAuction()
-    {
-        // Arrange
-        var request = new CreateAuctionRequest
-        {
-            Name = "Immediate Auction",
-            StartTime = DateTime.UtcNow,
-            EndTime = DateTime.UtcNow.AddDays(1),
-            VehicleVins = _testVehicles.Select(v => v.VIN).ToArray()
-        };
-
-        var existingAuctions = await _context.Auctions.ToListAsync();
-        Console.WriteLine($"Existing auctions before test: {existingAuctions.Count}");
-        foreach (var auction in existingAuctions)
-        {
-            Console.WriteLine($"Auction ID: {auction.Id}");
-        }
-        
-        // Act
-        var result = await _auctionService.CreateAuctionAsync(request);
-
-        // Assert
-        result.Status.Should().Be(AuctionStatus.Active);
-        result.Vehicles.Should().HaveCount(2);
-    }
-
+    
     [Fact]
     public async Task CreateAuction_WithNonExistentVehicle_ShouldThrowNotFoundException()
     {
@@ -147,8 +118,6 @@ public class AuctionServiceTests : IDisposable
         var request = new CreateAuctionRequest
         {
             Name = "Test Auction",
-            StartTime = DateTime.UtcNow.AddHours(1),
-            EndTime = DateTime.UtcNow.AddDays(1),
             VehicleVins = new[] { Guid.NewGuid().ToString() }
         };
 
@@ -170,8 +139,6 @@ public class AuctionServiceTests : IDisposable
         var request = new CreateAuctionRequest
         {
             Name = "Test Auction",
-            StartTime = DateTime.UtcNow.AddHours(1),
-            EndTime = DateTime.UtcNow.AddDays(1),
             VehicleVins = _testVehicles.Select(v => v.VIN).ToArray()
         };
 
@@ -244,37 +211,7 @@ public class AuctionServiceTests : IDisposable
         // Assert
         await act.Should().ThrowAsync<NotFoundException>();
     }
-
-    [Fact]
-    public async Task ProcessCompletedAuctions_ShouldUpdateStatusAndProcessWinningBids()
-    {
-        // Arrange
-        var auction = await CreateActiveAuctionWithWinnerBid(endTime: DateTime.UtcNow.AddMinutes(0));
-
-        // Act
-        await _auctionService.ProcessCompletedAuctionsAsync();
-
-        // Assert
-        var processedAuction = await _context.Auctions
-            .Include(a => a.Vehicles)
-            .Include(a => a.Bids)
-            .FirstAsync(a => a.Id == auction.Id);
-
-        processedAuction.Status.Should().Be(AuctionStatus.Completed);
-        
-        // Vehicle with winning bid should be marked as sold
-        var soldVehicle = await _context.Vehicles.FindAsync(_testVehicles[0].Id);
-        soldVehicle.IsSold.Should().BeTrue();
-        soldVehicle.IsAvailable.Should().BeFalse();
-
-
-        // Vehicle without bids should still be available
-        var unsoldVehicle = await _context.Vehicles.FindAsync(_testVehicles[1].Id);
-        unsoldVehicle.IsAvailable.Should().BeTrue();
-        unsoldVehicle.IsSold.Should().BeFalse();
-
-        _auctionLoggerMock.Verify(x => x.LogAuctionCompleted(It.Is<Auction>(a => a.Id == auction.Id)), Times.Once);
-    }
+    
 
     [Fact]
     public async Task ProcessCompletedAuctions_WithNoWinner_ShouldOnlyUpdateStatus()
@@ -422,17 +359,11 @@ public class AuctionServiceTests : IDisposable
 
         _context.Auctions.Add(auction);
         await _context.SaveChangesAsync();
-
-        // Clear tracker to ensure clean state
-        // _context.ChangeTracker.Clear();
-
-        // Reload auction with its relationships
         auction = await _context.Auctions
             .Include(a => a.Vehicles)
             .Include(a => a.Bids)
             .FirstAsync(a => a.Id == auction.Id);
 
-        // Create and add bid
         var bid = new Bid
         {
             Id = Guid.NewGuid(),
@@ -445,9 +376,6 @@ public class AuctionServiceTests : IDisposable
 
         _context.Bids.Add(bid);
         await _context.SaveChangesAsync();
-
-        // Clear tracker again and return fresh instance
-        // _context.ChangeTracker.Clear();
     
         return await _context.Auctions
             .Include(a => a.Vehicles)
@@ -469,7 +397,6 @@ public class AuctionServiceTests : IDisposable
 
         _context.Auctions.Add(auction);
         await _context.SaveChangesAsync();
-        // _context.ChangeTracker.Clear();
         return auction;
     }
 

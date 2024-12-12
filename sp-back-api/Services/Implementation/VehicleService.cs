@@ -35,7 +35,7 @@ public class VehicleService : IVehicleService
                 VehicleType.Suv when (request.NumberOfSeats != 0 
                                       && (request.NumberOfDoors == null || request.NumberOfDoors == 0)
                                       && (request.LoadCapacity == null || request.LoadCapacity == 0)
-                ) => new SUV
+                ) => new Suv
                 {
                     VIN = request.VIN,
                     Make = request.Make,
@@ -106,7 +106,6 @@ public class VehicleService : IVehicleService
             if (!existingVehicle.IsAvailable)
                 throw new InvalidOperationException("Cannot update vehicle that is in auction");
 
-            // If type is changing, validate the new type's requirements
             if (request.Type.HasValue && request.Type != existingVehicle.Type)
             {
                 Vehicle updatedVehicle = request.Type switch
@@ -114,7 +113,7 @@ public class VehicleService : IVehicleService
                     VehicleType.Suv when (request.NumberOfSeats is not null and not 0
                                         && request.NumberOfDoors is null or 0
                                         && request.LoadCapacity is null or 0) 
-                        => new SUV
+                        => new Suv
                         {
                             Id = existingVehicle.Id,
                             VIN = request.VIN ?? existingVehicle.VIN,
@@ -202,23 +201,19 @@ public class VehicleService : IVehicleService
             existingVehicle.ProductionDate = request.ProductionDate ?? existingVehicle.ProductionDate;
             existingVehicle.StartingPrice = request.StartingPrice ?? existingVehicle.StartingPrice;
 
-            switch (existingVehicle.Type)
+            switch (existingVehicle)
             {
-                case VehicleType.Suv:
-                    if (request.NumberOfSeats.HasValue)
-                        existingVehicle.NumberOfSeats = request.NumberOfSeats.Value;
+                case Suv suv when request.NumberOfSeats.HasValue:
+                    suv.NumberOfSeats = request.NumberOfSeats.Value;
                     break;
-                case VehicleType.Sedan:
-                    if (request.NumberOfDoors.HasValue)
-                        existingVehicle.NumberOfDoors = request.NumberOfDoors.Value;
+                case Sedan sedan when request.NumberOfDoors.HasValue:
+                    sedan.NumberOfDoors = request.NumberOfDoors.Value;
                     break;
-                case VehicleType.Hatchback:
-                    if (request.NumberOfDoors.HasValue)
-                        existingVehicle.NumberOfDoors = request.NumberOfDoors.Value;
+                case Hatchback hatchback when request.NumberOfDoors.HasValue:
+                    hatchback.NumberOfDoors = request.NumberOfDoors.Value;
                     break;
-                case VehicleType.Truck:
-                    if (request.LoadCapacity.HasValue)
-                        existingVehicle.LoadCapacity = request.LoadCapacity.Value;
+                case Truck truck when request.LoadCapacity.HasValue:
+                    truck.LoadCapacity = request.LoadCapacity.Value;
                     break;
             }
 
@@ -230,32 +225,7 @@ public class VehicleService : IVehicleService
             throw;
         }
     }
-    // public async Task<Vehicle> UpdateVehicleAsync(Guid id, UpdateVehicleRequest request)
-    // {
-    //     try
-    //     {
-    //         var vehicle = await _vehicleRepository.GetByIdAsync(id) 
-    //             ?? throw new NotFoundException($"Vehicle with ID {id} not found");
-    //
-    //         if (!vehicle.IsAvailable)
-    //             throw new InvalidOperationException("Cannot update vehicle that is in auction");
-    //
-    //         vehicle.VIN = request.VIN ?? vehicle.VIN;
-    //         vehicle.Make = request.Make ?? vehicle.Make;
-    //         vehicle.Model = request.Model ?? vehicle.Model;
-    //         vehicle.ProductionDate = request.ProductionDate ?? vehicle.ProductionDate;
-    //         vehicle.Type = request.Type ?? vehicle.Type;
-    //         vehicle.StartingPrice = request.StartingPrice ?? vehicle.StartingPrice;
-    //
-    //         return await _vehicleRepository.UpdateAsync(vehicle);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         _logger.LogError(ex, "Error updating vehicle: {Id}", id);
-    //         throw;
-    //     }
-    // }
-
+    
     public async Task<Vehicle> GetVehicleAsync(Guid id)
     {
         try
