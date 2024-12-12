@@ -1,0 +1,571 @@
+{
+  "Timestamp": "2024-12-12T01:43:32.5211221Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T01:43:11.6560857Z",
+  "EndTime": "2024-12-12T01:43:32.4605076Z",
+  "TotalVehicles": 2,
+  "SoldVehicles": 1,
+  "SoldVehicleDetails": [
+    {
+      "VehicleInfo": {
+        "Id": "8b5e7a89-ef1d-4a07-9425-c884b0c148ab",
+        "Make": "Honda",
+        "Model": "Civic",
+        "Year": "2022",
+        "Type": "Sedan"
+      },
+      "WinningBid": 30000,
+      "WinningBidder": "winner1235"
+    }
+  ]
+}
+{
+  "Timestamp": "2024-12-12T01:43:32.5488897Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T01:43:11.6560857Z",
+  "EndTime": "2024-12-12T01:43:32.4605076Z",
+  "TotalVehicles": 2,
+  "SoldVehicles": 0,
+  "SoldVehicleDetails": []
+}
+{
+  "Timestamp": "2024-12-12T01:51:42.0736175Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T01:51:30.3705051Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 1,
+  "SoldVehicleDetails": [
+    {
+      "VehicleInfo": {
+        "Id": "8b5e7a89-ef1d-4a07-9425-c884b0c148ab",
+        "Make": "Honda",
+        "Model": "Civic",
+        "Year": "2022",
+        "Type": "Sedan"
+      },
+      "WinningBid": 30000,
+      "WinningBidder": "winner1235"
+    }
+  ]
+}
+{
+  "Timestamp": "2024-12-12T01:51:43.7853828Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T01:51:30.3705051Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 0,
+  "SoldVehicleDetails": []
+}
+{
+  "Timestamp": "2024-12-12T02:00:43.6198581Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T01:58:43.6693982Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 1,
+  "SoldVehicleDetails": [
+    {
+      "VehicleInfo": {
+        "Id": "8b5e7a89-ef1d-4a07-9425-c884b0c148ab",
+        "Make": "Honda",
+        "Model": "Civic",
+        "Year": "2022",
+        "Type": "Sedan"
+      },
+      "WinningBid": 30000,
+      "WinningBidder": "winner1235"
+    }
+  ]
+}
+{
+  "Timestamp": "2024-12-12T02:00:44.9875791Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T01:58:43.6693982Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 0,
+  "SoldVehicleDetails": []
+}
+{
+  "Timestamp": "2024-12-12T02:03:17.4938043Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:02:32.2170451Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 1,
+  "SoldVehicleDetails": [
+    {
+      "VehicleInfo": {
+        "Id": "8b5e7a89-ef1d-4a07-9425-c884b0c148ab",
+        "Make": "Honda",
+        "Model": "Civic",
+        "Year": "2022",
+        "Type": "Sedan"
+      },
+      "WinningBid": 30000,
+      "WinningBidder": "winner1235"
+    }
+  ]
+}
+{
+  "Timestamp": "2024-12-12T02:03:43.5448481Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:02:32.2170451Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 0,
+  "SoldVehicleDetails": []
+}
+{
+  "Timestamp": "2024-12-12T02:10:28.836473Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:09:15.7985023Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 1,
+  "SoldVehicleDetails": [
+    {
+      "VehicleInfo": {
+        "Id": "8b5e7a89-ef1d-4a07-9425-c884b0c148ab",
+        "Make": "Honda",
+        "Model": "Civic",
+        "Year": "2022",
+        "Type": "Sedan"
+      },
+      "WinningBid": 100000,
+      "WinningBidder": "carlos"
+    }
+  ]
+}
+{
+  "Timestamp": "2024-12-12T02:10:28.8563629Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:09:15.7985023Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 0,
+  "SoldVehicleDetails": []
+}
+{
+  "Timestamp": "2024-12-12T02:14:03.9148231Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:13:54.8987392Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 1,
+  "SoldVehicleDetails": [
+    {
+      "VehicleInfo": {
+        "Id": "8b5e7a89-ef1d-4a07-9425-c884b0c148ab",
+        "Make": "Honda",
+        "Model": "Civic",
+        "Year": "2022",
+        "Type": "Sedan"
+      },
+      "WinningBid": 30000,
+      "WinningBidder": "winner1235"
+    }
+  ]
+}
+{
+  "Timestamp": "2024-12-12T02:14:03.956014Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:13:54.8987392Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 0,
+  "SoldVehicleDetails": []
+}
+{
+  "Timestamp": "2024-12-12T02:14:49.6352505Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:14:46.1820957Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 1,
+  "SoldVehicleDetails": [
+    {
+      "VehicleInfo": {
+        "Id": "8b5e7a89-ef1d-4a07-9425-c884b0c148ab",
+        "Make": "Honda",
+        "Model": "Civic",
+        "Year": "2022",
+        "Type": "Sedan"
+      },
+      "WinningBid": 30000,
+      "WinningBidder": "winner1235"
+    }
+  ]
+}
+{
+  "Timestamp": "2024-12-12T02:14:49.6743756Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:14:46.1820957Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 0,
+  "SoldVehicleDetails": []
+}
+{
+  "Timestamp": "2024-12-12T02:17:43.5699857Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:17:01.7121458Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 1,
+  "SoldVehicleDetails": [
+    {
+      "VehicleInfo": {
+        "Id": "8b5e7a89-ef1d-4a07-9425-c884b0c148ab",
+        "Make": "Honda",
+        "Model": "Civic",
+        "Year": "2022",
+        "Type": "Sedan"
+      },
+      "WinningBid": 30000,
+      "WinningBidder": "winner1235"
+    }
+  ]
+}
+{
+  "Timestamp": "2024-12-12T02:18:47.2938413Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:18:33.8871758Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 1,
+  "SoldVehicleDetails": [
+    {
+      "VehicleInfo": {
+        "Id": "8b5e7a89-ef1d-4a07-9425-c884b0c148ab",
+        "Make": "Honda",
+        "Model": "Civic",
+        "Year": "2022",
+        "Type": "Sedan"
+      },
+      "WinningBid": 30000,
+      "WinningBidder": "winner1235"
+    }
+  ]
+}
+{
+  "Timestamp": "2024-12-12T02:20:51.1964408Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:20:29.3524971Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 1,
+  "SoldVehicleDetails": [
+    {
+      "VehicleInfo": {
+        "Id": "8b5e7a89-ef1d-4a07-9425-c884b0c148ab",
+        "Make": "Honda",
+        "Model": "Civic",
+        "Year": "2022",
+        "Type": "Sedan"
+      },
+      "WinningBid": 30000,
+      "WinningBidder": "winner1235"
+    }
+  ]
+}
+{
+  "Timestamp": "2024-12-12T02:21:03.7784412Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:20:29.3524971Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 0,
+  "SoldVehicleDetails": []
+}
+{
+  "Timestamp": "2024-12-12T02:24:12.2049244Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:23:33.5103966Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 1,
+  "SoldVehicleDetails": [
+    {
+      "VehicleInfo": {
+        "Id": "8b5e7a89-ef1d-4a07-9425-c884b0c148ab",
+        "Make": "Honda",
+        "Model": "Civic",
+        "Year": "2022",
+        "Type": "Sedan"
+      },
+      "WinningBid": 30000,
+      "WinningBidder": "winner1235"
+    }
+  ]
+}
+{
+  "Timestamp": "2024-12-12T02:24:12.250106Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:23:33.5103966Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 0,
+  "SoldVehicleDetails": []
+}
+{
+  "Timestamp": "2024-12-12T02:27:59.97896Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:27:22.2933461Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 1,
+  "SoldVehicleDetails": [
+    {
+      "VehicleInfo": {
+        "Id": "8b5e7a89-ef1d-4a07-9425-c884b0c148ab",
+        "Make": "Honda",
+        "Model": "Civic",
+        "Year": "2022",
+        "Type": "Sedan",
+        "StartingPrice": 28000
+      },
+      "WinningBid": 30000,
+      "WinningBidder": "winner1235"
+    }
+  ]
+}
+{
+  "Timestamp": "2024-12-12T02:28:00.0075034Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:27:22.2933461Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 0,
+  "SoldVehicleDetails": []
+}
+{
+  "Timestamp": "2024-12-12T02:30:35.8279158Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:30:19.6215017Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 1,
+  "SoldVehicleDetails": [
+    {
+      "VehicleInfo": {
+        "Id": "8b5e7a89-ef1d-4a07-9425-c884b0c148ab",
+        "Make": "Honda",
+        "Model": "Civic",
+        "Year": "2022",
+        "Type": "Sedan",
+        "StartingPrice": 28000
+      },
+      "WinningBid": 30000,
+      "WinningBidder": "winner1235"
+    }
+  ]
+}
+{
+  "Timestamp": "2024-12-12T02:30:35.8542903Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:30:19.6215017Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 0,
+  "SoldVehicleDetails": []
+}
+{
+  "Timestamp": "2024-12-12T02:35:56.4304491Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:35:50.0597745Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 1,
+  "SoldVehicleDetails": [
+    {
+      "VehicleInfo": {
+        "Id": "8b5e7a89-ef1d-4a07-9425-c884b0c148ab",
+        "Make": "Honda",
+        "Model": "Civic",
+        "Year": "2022",
+        "Type": "Sedan",
+        "StartingPrice": 28000
+      },
+      "WinningBid": 30000,
+      "WinningBidder": "winner1235"
+    }
+  ]
+}
+{
+  "Timestamp": "2024-12-12T02:35:56.4852527Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:35:50.0597745Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 0,
+  "SoldVehicleDetails": []
+}
+{
+  "Timestamp": "2024-12-12T02:36:39.3828201Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:36:33.2560138Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 2,
+  "SoldVehicleDetails": [
+    {
+      "VehicleInfo": {
+        "Id": "c5ae495d-9bd7-4256-981c-931d2b3bd999",
+        "Make": "Mazda",
+        "Model": "Hatchback",
+        "Year": "2024",
+        "Type": "Hatchback",
+        "StartingPrice": 35000
+      },
+      "WinningBid": 40000,
+      "WinningBidder": "winner123"
+    },
+    {
+      "VehicleInfo": {
+        "Id": "8b5e7a89-ef1d-4a07-9425-c884b0c148ab",
+        "Make": "Honda",
+        "Model": "Civic",
+        "Year": "2022",
+        "Type": "Sedan",
+        "StartingPrice": 28000
+      },
+      "WinningBid": 30000,
+      "WinningBidder": "winner1235"
+    }
+  ]
+}
+{
+  "Timestamp": "2024-12-12T02:36:39.4225151Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:36:33.2560138Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 2,
+  "SoldVehicleDetails": [
+    {
+      "VehicleInfo": {
+        "Id": "c5ae495d-9bd7-4256-981c-931d2b3bd999",
+        "Make": "Mazda",
+        "Model": "Hatchback",
+        "Year": "2024",
+        "Type": "Hatchback",
+        "StartingPrice": 35000
+      },
+      "WinningBid": 40000,
+      "WinningBidder": "winner123"
+    },
+    {
+      "VehicleInfo": {
+        "Id": "8b5e7a89-ef1d-4a07-9425-c884b0c148ab",
+        "Make": "Honda",
+        "Model": "Civic",
+        "Year": "2022",
+        "Type": "Sedan",
+        "StartingPrice": 28000
+      },
+      "WinningBid": 30000,
+      "WinningBidder": "winner1235"
+    }
+  ]
+}
+{
+  "Timestamp": "2024-12-12T02:38:01.300716Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:37:51.8184438Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 2,
+  "SoldVehicleDetails": [
+    {
+      "VehicleInfo": {
+        "Id": "c5ae495d-9bd7-4256-981c-931d2b3bd999",
+        "Make": "Mazda",
+        "Model": "Hatchback",
+        "Year": "2024",
+        "Type": "Hatchback",
+        "StartingPrice": 35000
+      },
+      "WinningBid": 40000,
+      "WinningBidder": "winner123"
+    },
+    {
+      "VehicleInfo": {
+        "Id": "8b5e7a89-ef1d-4a07-9425-c884b0c148ab",
+        "Make": "Honda",
+        "Model": "Civic",
+        "Year": "2022",
+        "Type": "Sedan",
+        "StartingPrice": 28000
+      },
+      "WinningBid": 30000,
+      "WinningBidder": "winner1235"
+    }
+  ]
+}
+{
+  "Timestamp": "2024-12-12T02:38:01.342667Z",
+  "AuctionId": "2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1",
+  "AuctionName": "Premium Auction",
+  "StartTime": "2024-12-10T02:37:51.8184438Z",
+  "EndTime": null,
+  "TotalVehicles": 2,
+  "SoldVehicles": 2,
+  "SoldVehicleDetails": [
+    {
+      "VehicleInfo": {
+        "Id": "c5ae495d-9bd7-4256-981c-931d2b3bd999",
+        "Make": "Mazda",
+        "Model": "Hatchback",
+        "Year": "2024",
+        "Type": "Hatchback",
+        "StartingPrice": 35000
+      },
+      "WinningBid": 40000,
+      "WinningBidder": "winner123"
+    },
+    {
+      "VehicleInfo": {
+        "Id": "8b5e7a89-ef1d-4a07-9425-c884b0c148ab",
+        "Make": "Honda",
+        "Model": "Civic",
+        "Year": "2022",
+        "Type": "Sedan",
+        "StartingPrice": 28000
+      },
+      "WinningBid": 30000,
+      "WinningBidder": "winner1235"
+    }
+  ]
+}
