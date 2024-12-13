@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using sp_back_api.DTOs;
-using sp_back_api.Extensions;
 using sp_back_api.Services;
 using sp_back.models.Models;
 
@@ -47,16 +46,29 @@ public static class VehicleHandlers
 
     public static async Task<IResult> UpdateVehicle(
         [FromBody] UpdateVehicleRequest request, 
+        IValidator<UpdateVehicleRequest> validator,
         IVehicleService vehicleService)
     {
+        var validationResult = await validator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
+        
         var vehicle = await vehicleService.UpdateVehicleAsync(request);
         return Results.Ok(vehicle.GetVehicleResponses());
     }
 
     public static async Task<IResult> DeleteVehicle(
         [FromBody] DeleteVehicleRequest request, 
+        IValidator<DeleteVehicleRequest> validator,
         IVehicleService vehicleService)
     {
+        var validationResult = await validator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
         await vehicleService.DeleteVehicleAsync(request);
         return Results.NoContent();
     }
