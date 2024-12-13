@@ -48,8 +48,14 @@ public static class AuctionHandlers
 
     public static async Task<IResult> PlaceBid(
         [FromBody] PlaceBidRequest request, 
+        IValidator<PlaceBidRequest> validator,
         IAuctionService auctionService)
     {
+        var validationResult = await validator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
         var auction = await auctionService.PlaceBidAsync(request);
         var bid = auction.GetBidInformation(request.BidderId, request.VehicleVin);
         var response = new PlaceBidResponse
@@ -65,40 +71,71 @@ public static class AuctionHandlers
 
     public static async Task<IResult> AddVehiclesToAuction(
         [FromBody] AddVehiclesToAuctionRequest request, 
+        IValidator<AddVehiclesToAuctionRequest> validator,
         IAuctionService auctionService)
     {
+        var validationResult = await validator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
+        
         var auction = await auctionService.AddVehiclesToAuctionAsync(request);
         return Results.Ok(AuctionResponseHandler.BuildResponse(auction));
     }
 
     public static async Task<IResult> RemoveVehiclesFromAuction(
         [FromBody] RemoveVehiclesFromAuctionRequest request,
+        IValidator<RemoveVehiclesFromAuctionRequest> validator,
         IAuctionService auctionService)
     {
+        var validationResult = await validator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
         var auction = await auctionService.RemoveVehiclesFromAuctionAsync(request);
         return Results.Ok(AuctionResponseHandler.BuildResponse(auction));
     }
 
     public static async Task<IResult> CancelAuction(
-        [FromBody] CancelAuctionResponse request, 
+        [FromBody] CloseAuctionRequest request, 
+        IValidator<CloseAuctionRequest> validator,
         IAuctionService auctionService)
     {
+        var validationResult = await validator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
         var auction = await auctionService.CancelAuctionAsync(request.AuctionName);
         return Results.Ok(AuctionResponseHandler.BuildResponse(auction));
     }
 
     public static async Task<IResult> CloseAuction(
         [FromBody] CloseAuctionRequest request, 
+        IValidator<CloseAuctionRequest> validator,
         IAuctionService auctionService)
     {
+        var validationResult = await validator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
         var auction = await auctionService.CloseAuctionAsync(request.AuctionName);
         return Results.Ok(AuctionResponseHandler.BuildCloseResponse(auction));
     }
 
     public static async Task<IResult> StartAuction(
         [FromBody] StartAuctionRequest request, 
+        IValidator<StartAuctionRequest> validator,
         IAuctionService auctionService)
     {
+        var validationResult = await validator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
         var auction = await auctionService.StartAuctionAsync(request.AuctionName);
         return Results.Ok(AuctionResponseHandler.BuildStartResponse(auction));
     }}

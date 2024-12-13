@@ -103,6 +103,9 @@ public class VehicleService : IVehicleService
             var existingVehicle = await _vehicleRepository.GetByIdAsync(request.Id)
                 ?? throw new NotFoundException($"Vehicle with ID {request.Id} not found");
 
+            if (CheckVehicleVin(request.VIN))
+                throw new ValidationException("New VIN already exists in database");
+            
             if (!existingVehicle.IsAvailable)
                 throw new InvalidOperationException("Cannot update vehicle that is in auction");
 

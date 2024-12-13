@@ -169,7 +169,8 @@ public class AuctionRepository : IAuctionRepository
         {
             _logger.LogError(ex, "Error retrieving completed auctions");
             throw;
-        }    }
+        }    
+    }
 
     public async Task<Auction> StartAuction(string auctionName)
     {

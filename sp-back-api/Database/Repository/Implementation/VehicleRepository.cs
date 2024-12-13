@@ -78,6 +78,8 @@ public class VehicleRepository : IVehicleRepository
             
             if (searchParams.YearTo.HasValue)
                 query = query.Where(v => v.ProductionDate.Year <= searchParams.YearTo.Value);
+            
+            query = query.Where(v => v.IsAvailable);
 
             return await query.ToListAsync();
         }

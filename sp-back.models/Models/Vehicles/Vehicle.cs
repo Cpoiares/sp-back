@@ -12,7 +12,7 @@ public abstract class Vehicle
     public string Model { get; set; }
     public DateTime ProductionDate { get; set; }
     public string Year => ProductionDate.Year.ToString();
-    public VehicleType Type { get; set; }
+    public VehicleType Type { get; set; } 
     public double StartingPrice { get; set; }
     public bool IsAvailable { get; set; } = true;
     public bool IsSold => !String.IsNullOrEmpty(BuyerId);

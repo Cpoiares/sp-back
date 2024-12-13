@@ -28,7 +28,7 @@ public static class VehicleHandlers
         IVehicleService vehicleService)
     {
         var vehicle = await vehicleService.GetVehicleAsync(id);
-        return vehicle is null ? Results.NotFound() : Results.Ok(vehicle.GetVehicleResponses());
+        return Results.Ok(vehicle.GetVehicleResponses());
     }
 
     public static async Task<IResult> CreateVehicle(

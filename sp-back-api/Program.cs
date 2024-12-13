@@ -21,6 +21,8 @@ using sp_back.models.Models.Vehicles;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 
+// TODO: Need to add validator to each request
+// TODO: Add bulk auction endpoint
 var builder = WebApplication.CreateBuilder(args);
 var projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../.."));
 

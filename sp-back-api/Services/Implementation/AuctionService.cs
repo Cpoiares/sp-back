@@ -246,6 +246,19 @@ public class AuctionService : IAuctionService
                 }
             }
             
+            var vehiclesWithoutBids = auction.Vehicles
+                .Where(v => String.IsNullOrEmpty(auction.GetHighestBidderForVehicle(v.Id)))
+                .ToList();
+
+            foreach (var vehicle in vehiclesWithoutBids)
+            {
+                vehicle.IsAvailable = true;
+                await _vehicleRepository.UpdateAsync(vehicle);
+                _logger.LogInformation(
+                    "Vehicle {VehicleId} in auction {AuctionId} received no bids", 
+                    vehicle.Id, 
+                    auction.Id);
+            }
             await _auctionRepository.CloseAuctionAsync(auction.Id);
             
             _logger.LogInformation("Auction {AuctionId} closed successfully", auctionName);
