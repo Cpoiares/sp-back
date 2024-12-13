@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using sp_back.models.Enums;
-using sp_back.models.Models;
 using sp_back.models.Models.Auction;
 using sp_back.models.Models.Vehicles;
 
@@ -25,7 +24,7 @@ public class AuctionDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             
-            entity.HasMany<Vehicle>(a => a.Vehicles)
+            entity.HasMany(a => a.Vehicles)
                 .WithOne(v => v.Auction)
                 .HasForeignKey(v => v.AuctionId)
                 .OnDelete(DeleteBehavior.Restrict);
@@ -175,6 +174,7 @@ public class AuctionDbContext : DbContext
                 Id = Guid.Parse("2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1"),
                 Name = "Premium Auction",
                 StartTime = DateTime.UtcNow.AddDays(-2),
+                EndTime = DateTime.UtcNow.AddMinutes(-1),
                 Status = AuctionStatus.Active,
             },
             new Auction

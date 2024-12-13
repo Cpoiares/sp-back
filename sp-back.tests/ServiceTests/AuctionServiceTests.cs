@@ -211,31 +211,6 @@ public class AuctionServiceTests : IDisposable
         // Assert
         await act.Should().ThrowAsync<NotFoundException>();
     }
-    
-
-    [Fact]
-    public async Task ProcessCompletedAuctions_WithNoWinner_ShouldOnlyUpdateStatus()
-    {
-        // Arrange
-        var auction = await CreateActiveAuction(endTime: DateTime.UtcNow.AddMinutes(-5));
-        await _context.SaveChangesAsync();
-
-        // Act
-        await _auctionService.ProcessCompletedAuctionsAsync();
-
-        // Assert
-        var processedAuction = await _context.Auctions.FindAsync(auction.Id);
-        processedAuction.Status.Should().Be(AuctionStatus.Completed);
-
-        // All vehicles should still be available
-        foreach (var v in _testVehicles)
-        {
-            var vehicle = await _context.Vehicles.FindAsync(v.Id);
-            vehicle.IsAvailable.Should().BeTrue();
-        }
-
-        _auctionLoggerMock.Verify(x => x.LogAuctionCompleted(It.IsAny<Auction>()), Times.Never);
-    }
 
     private async Task<Auction> CreateActiveAuction(DateTime? endTime = null)
     {

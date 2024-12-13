@@ -72,6 +72,7 @@ public class AuctionRepository : IAuctionRepository
         {
             return await _context.Auctions
                 .Include(a => a.Vehicles)
+                .Include(b => b.Bids)
                 .Where(a => a.Status == AuctionStatus.Completed)
                 .ToListAsync();
         }
@@ -88,6 +89,7 @@ public class AuctionRepository : IAuctionRepository
         {
             return await _context.Auctions
                 .Include(a => a.Vehicles)
+                .Include(a => a.Bids)
                 .Where(a =>
                     a.Status == AuctionStatus.Active &&
                     a.EndTime <= endTime)

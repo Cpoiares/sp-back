@@ -316,8 +316,9 @@ public class AuctionService : IAuctionService
                         var highestBidderId = auction.GetHighestBidderForVehicle(vehicle.Id);
                         if (highestBidderId == null) continue;
                         await MarkVehicleAsSold(vehicle.Id, highestBidderId);
-                        await _auctionLogger.LogAuctionCompleted(auction);
                     }
+                    
+                    await _auctionLogger.LogAuctionCompleted(auction);
 
                     var vehiclesWithoutBids = auction.Vehicles
                         .Except(vehiclesWithBids)
