@@ -15,9 +15,7 @@ public class CreateAuctionValidator : AbstractValidator<CreateAuctionRequest>
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .WithMessage("Auction name is required")
-            .MaximumLength(100)
-            .WithMessage("Auction name cannot exceed 100 characters");
+            .WithMessage("Auction name is required");
         
         RuleFor(x => x.VehicleVins)
             .NotNull()

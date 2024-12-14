@@ -61,12 +61,10 @@ public class AuctionDbContext : DbContext
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Make)
-                .IsRequired()
-                .HasMaxLength(50);
+                .IsRequired();
 
             entity.Property(e => e.Model)
-                .IsRequired()
-                .HasMaxLength(50);
+                .IsRequired();
             
             entity.HasOne(v => v.Auction)
                 .WithMany(a => a.Vehicles)

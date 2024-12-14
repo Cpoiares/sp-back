@@ -24,16 +24,15 @@ public class CreateVehicleValidator : AbstractValidator<CreateVehicleRequest>
             .NotEmpty();
         
         RuleFor(x => x.Make)
-            .NotEmpty()
-            .MaximumLength(50);
+            .NotEmpty();
 
         RuleFor(x => x.Model)
-            .NotEmpty()
-            .MaximumLength(50);
+            .NotEmpty();
 
         RuleFor(x => x.ProductionDate)
             .NotEmpty()
-            .LessThanOrEqualTo(DateTime.UtcNow);
+            .LessThanOrEqualTo(DateTime.UtcNow)
+            .WithMessage("Production date must be a valid date and not in the future.");
 
         RuleFor(x => x.StartingPrice)
             .GreaterThan(0);
