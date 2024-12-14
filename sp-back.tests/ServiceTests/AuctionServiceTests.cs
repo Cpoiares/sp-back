@@ -265,7 +265,7 @@ public class AuctionServiceTests : IDisposable
         var act = () => _auctionService.CancelAuctionAsync(auction.Name);
 
         // Assert
-        await act.Should().ThrowAsync<InvalidOperationException>()
+        await act.Should().ThrowAsync<ValidationException>()
             .WithMessage("Cannot cancel a completed auction");
     }
 
@@ -304,7 +304,7 @@ public class AuctionServiceTests : IDisposable
         // Act & Assert
         var act = async () => await _auctionService.CloseAuctionAsync(auction.Name);
     
-        await act.Should().ThrowAsync<InvalidOperationException>()
+        await act.Should().ThrowAsync<ValidationException>()
             .WithMessage("Can only close active auctions");
     }
     
@@ -385,7 +385,7 @@ public class AuctionServiceTests : IDisposable
         var act = () => _auctionService.PlaceBidInCollectiveAuction(lowerBidRequest);
 
         // Assert
-        await act.Should().ThrowAsync<InvalidOperationException>()
+        await act.Should().ThrowAsync<ValidationException>()
             .WithMessage("*Bid must be at least*");
     }
     

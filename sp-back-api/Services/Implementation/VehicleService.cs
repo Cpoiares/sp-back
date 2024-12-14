@@ -267,7 +267,7 @@ public class VehicleService : IVehicleService
                 ?? throw new NotFoundException($"Vehicle with ID {request.Id} not found");
 
             if (!vehicle.IsAvailable)
-                throw new InvalidOperationException("Cannot delete vehicle that is in auction");
+                throw new InvalidOperationException("Vehicle is not available");
 
             await _vehicleRepository.DeleteAsync(request.Id);
         }

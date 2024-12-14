@@ -15,7 +15,7 @@ public abstract class Vehicle
     public VehicleType Type { get; set; } 
     public double StartingPrice { get; set; }
     public bool IsAvailable { get; set; } = true;
-    public bool IsSold => !String.IsNullOrEmpty(BuyerId);
+    public bool IsSold => !string.IsNullOrEmpty(BuyerId);
     public string? BuyerId { get; set; }
     public Guid? AuctionId { get; set; }
     public string VIN { get; set; }

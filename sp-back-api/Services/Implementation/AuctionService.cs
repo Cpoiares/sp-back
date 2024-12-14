@@ -10,7 +10,6 @@ using sp_back.models.Enums;
 using sp_back.models.Exceptions;
 using sp_back.models.Models.Auction;
 using sp_back.models.Models.Vehicles;
-using ValidationException = System.ComponentModel.DataAnnotations.ValidationException;
 
 namespace sp_back_api.Services.Implementation;
 
@@ -348,7 +347,7 @@ public class AuctionService : IAuctionService
             }
             
             var vehiclesWithoutBids = auction.Vehicles
-                .Where(v => String.IsNullOrEmpty(auction.GetHighestBidderForVehicle(v.Id)))
+                .Where(v => string.IsNullOrEmpty(auction.GetHighestBidderForVehicle(v.Id)))
                 .ToList();
 
             foreach (var vehicle in vehiclesWithoutBids)
