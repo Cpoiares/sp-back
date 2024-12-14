@@ -42,7 +42,7 @@ public class AuctionProcessingService : BackgroundService
     }
 
     private async Task ProcessAuctions(CancellationToken stoppingToken)
-    {
+    { 
         using var scope = _scopeFactory.CreateScope();
         var auctionService = scope.ServiceProvider.GetRequiredService<IAuctionService>();
 

@@ -16,7 +16,7 @@ public static class AuctionResponseHandler
                 VIN = v.VIN,
                 Name = $"{v.Make} {v.Model}",
                 VehicleStartingPrice = v.StartingPrice,
-                WinningBid = auction.GetHighestBidForVehicle(v.Id).Amount,
+                WinningBid = string.IsNullOrEmpty(auction.GetHighestBidderForVehicle(v.Id)) ? null : auction.GetHighestBidForVehicle(v.Id)?.Amount,
                 BidderId = auction.GetHighestBidderForVehicle(v.Id)
             }).ToList(),
             StartTime = auction.StartTime,
@@ -35,7 +35,7 @@ public static class AuctionResponseHandler
                 VIN = v.VIN,
                 Name = $"{v.Make}{v.Model}",
                 VehicleStartingPrice = v.StartingPrice,
-                WinningBid = auction.GetHighestBidForVehicle(v.Id).Amount,
+                WinningBid =  string.IsNullOrEmpty(auction.GetHighestBidderForVehicle(v.Id)) ? null : auction.GetHighestBidForVehicle(v.Id)?.Amount,
                 BidderId = auction.GetHighestBidderForVehicle(v.Id)
             }).ToList(),
             StartDate = auction?.StartTime ?? DateTime.UtcNow,
@@ -52,7 +52,7 @@ public static class AuctionResponseHandler
                 VIN = v.VIN,
                 Name = $"{v.Make}{v.Model}",
                 VehicleStartingPrice = v.StartingPrice,
-                WinningBid = auction.GetHighestBidForVehicle(v.Id).Amount,
+                WinningBid = string.IsNullOrEmpty(auction.GetHighestBidderForVehicle(v.Id)) ? null : auction.GetHighestBidForVehicle(v.Id)?.Amount,
                 BidderId = auction.GetHighestBidderForVehicle(v.Id)
             }).ToList(),
             EndDate = auction.EndTime ?? DateTime.UtcNow,

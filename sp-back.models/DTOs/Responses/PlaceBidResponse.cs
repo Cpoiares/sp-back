@@ -2,7 +2,7 @@
 
 public record PlaceBidResponse
 {
-    public Guid BidId { get; set; }
+    public Guid? BidId { get; set; }
     public double Amount { get; set; }
     public DateTime? BidTime { get; set; }
     public string Bidder { get; set; }

@@ -5,6 +5,7 @@ using sp_back_api.Database.Repository;
 using sp_back_api.DTOs;
 using sp_back_api.Loging;
 using sp_back.models.Config;
+using sp_back.models.DTOs.Requests;
 using sp_back.models.Enums;
 using sp_back.models.Exceptions;
 using sp_back.models.Models.Auction;
@@ -27,7 +28,7 @@ public class AuctionService : IAuctionService
         IVehicleRepository vehicleRepository,
         IAuctionLogger auctionLogger,
         IOptions<AppSettings> appSettings,
-        ILogger<AuctionService> logger, 
+        ILogger<AuctionService> logger,
         IVehicleService vehicleService)
     {
         _auctionRepository = auctionRepository;
@@ -43,12 +44,11 @@ public class AuctionService : IAuctionService
         try
         {
             var auctionVehicles = new List<Vehicle>();
-            ValidateAuctionDto(request);
             foreach (var vin in request.VehicleVins)
             {
                 var vehicle = await _vehicleRepository.GetByVINAsync(vin)
                               ?? throw new NotFoundException($"Vehicle with ID {vin} not found");
-                
+
                 var a = await _auctionRepository.GetActiveAuctionByVehicleIdAsync(vehicle.Id);
                 if (a != null)
                     throw new InvalidOperationException("Vehicle is already in an active auction");
@@ -60,7 +60,7 @@ public class AuctionService : IAuctionService
                 vehicle.IsAvailable = false;
                 auctionVehicles.Add(vehicle);
             }
-            
+
             var auction = new Auction
             {
                 Name = request.Name,
@@ -68,15 +68,16 @@ public class AuctionService : IAuctionService
                 Status = AuctionStatus.Waiting,
                 EndTime = request.EndDate,
             };
-            
-            
+
+
 
             await _vehicleService.LockVehicleInAuction(auctionVehicles);
             return await _auctionRepository.AddAsync(auction);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating auction with vehicles: {VehicleId}", string.Join(',', request.VehicleVins));
+            _logger.LogError(ex, "Error creating auction with vehicles: {VehicleId}",
+                string.Join(',', request.VehicleVins));
             throw;
         }
     }
@@ -86,13 +87,14 @@ public class AuctionService : IAuctionService
         try
         {
             var a = await _auctionRepository.GetAuctionByNameAsync(auctionName);
-            
-            if(a == null)
+
+            if (a == null)
                 throw new NotFoundException($"Auction with name {auctionName} not found");
-            
+
             if (a.Status != AuctionStatus.Waiting)
-                throw new ValidationException("Cannot start an auction that is cancelled, in progress or already completed.");
-            
+                throw new ValidationException(
+                    "Cannot start an auction that is cancelled, in progress or already completed.");
+
 
             var auction = await _auctionRepository.StartAuction(auctionName);
             return auction;
@@ -103,7 +105,103 @@ public class AuctionService : IAuctionService
             throw;
         }
     }
-    
+
+    public async Task<Auction> CreateCollectiveAuction(CreateCollectiveAuctionRequest request)
+    {
+        try
+        {
+            var auctionVehicles = new List<Vehicle>();
+
+            foreach (var vin in request.VehicleVins)
+            {
+                var vehicle = await _vehicleRepository.GetByVINAsync(vin)
+                              ?? throw new NotFoundException($"Vehicle with ID {vin} not found");
+
+                var a = await _auctionRepository.GetActiveAuctionByVehicleIdAsync(vehicle.Id);
+                if (a != null)
+                    throw new InvalidOperationException("Vehicle is already in an active auction");
+                if (!vehicle.IsAvailable)
+                    throw new InvalidOperationException("Vehicle is not available for auction");
+                if (vehicle.IsSold)
+                    throw new InvalidOperationException("Vehicle is not available for auction as it was already sold");
+
+                vehicle.StartingPrice = request.StartingBid;
+                auctionVehicles.Add(vehicle);
+            }
+
+            var auction = new Auction
+            {
+                Name = request.AuctionName,
+                Vehicles = auctionVehicles,
+                Status = AuctionStatus.Waiting,
+                IsCollectiveAuction = true,
+                EndTime = request.EndDate,
+            };
+
+
+
+            await _vehicleService.LockVehicleInAuction(auctionVehicles);
+            return await _auctionRepository.AddAsync(auction);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating auction with vehicles: {VehicleId}",
+                string.Join(',', request.VehicleVins));
+            throw;
+        }
+    }
+
+    public async Task<Auction> PlaceBidInCollectiveAuction(PlaceBidInCollectiveAuctionRequest request)
+    {
+        try
+        {
+            var auction = await _auctionRepository.GetAuctionByNameAsync(request.AuctionName)
+                          ?? throw new NotFoundException($"No Auction was found for name {request.AuctionName}");
+
+            if (auction.Status != AuctionStatus.Active)
+                throw new ValidationException("Auction is not active");
+
+            if (!auction.IsCollectiveAuction)
+                throw new ValidationException("Auction is not collective auction");
+            
+            if (auction.EndTime <= DateTime.UtcNow)
+                throw new ValidationException("Auction has ended");
+            
+            if(!auction.Vehicles.Any())
+                throw new ValidationException($"No vehicles are available in auction {auction.Name}");
+            
+            var highestBidForVehicle = auction.GetHighestBidForVehicle(auction.Vehicles.First().Id);
+            
+            if (request.Amount < highestBidForVehicle.Amount)
+                throw new ValidationException(
+                    $"Bid must be at least {highestBidForVehicle.Amount}");
+            
+            foreach (var vehicle in auction.Vehicles)
+            {
+                var bid = new Bid
+                {
+                    BidderId = request.BidderId,
+                    Amount = request.Amount,
+                    BidTime = DateTime.UtcNow,
+                    AuctionId = auction.Id,
+                    VehicleId = vehicle.Id
+                };
+
+                await _auctionRepository.AddBidAsync(bid);
+            }
+            
+            auction = await _auctionRepository.GetByIdAsync(auction.Id);
+            _logger.LogInformation("Bid placed successfully on all vehicles of auction {auctionName}", request.AuctionName);
+            return auction;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error placing bid on all vehicles of auction: {auctionName}", request.AuctionName);
+            throw;
+        }    
+    }
+
+
     public async Task<Auction> GetAuctionAsync(Guid id)
     {
         try
@@ -161,13 +259,16 @@ public class AuctionService : IAuctionService
                 ?? throw new NotFoundException($"No Auction was found for Vehicle {request.VehicleVin}");
 
             if (auction.Status != AuctionStatus.Active)
-                throw new InvalidOperationException("Auction is not active");
+                throw new ValidationException("Auction is not active");
+            
+            if (auction.IsCollectiveAuction)
+                throw new ValidationException("Auction is not collective auction, individual bids on vehicles cannot be placed");
 
             if (auction.EndTime <= DateTime.UtcNow)
-                throw new InvalidOperationException("Auction has ended");
+                throw new ValidationException("Auction has ended");
             var highestBidForVehicle = auction.GetHighestBidForVehicle(vehicle.Id);
             if (request.Amount < highestBidForVehicle.Amount)
-                throw new InvalidOperationException(
+                throw new ValidationException(
                     $"Bid must be at least {highestBidForVehicle.Amount}");
             
             var bid = new Bid
@@ -198,7 +299,7 @@ public class AuctionService : IAuctionService
                           ?? throw new NotFoundException($"Auction with ID {auctionName} not found");
 
             if (auction.Status == AuctionStatus.Completed)
-                throw new InvalidOperationException("Cannot cancel a completed auction");
+                throw new ValidationException("Cannot cancel a completed auction");
 
             // Release all vehicles
             foreach (var vehicle in auction.Vehicles.ToList())
@@ -233,7 +334,7 @@ public class AuctionService : IAuctionService
                           ?? throw new NotFoundException($"Auction with name {auctionName} not found");
 
             if (auction.Status != AuctionStatus.Active)
-                throw new InvalidOperationException("Can only close active auctions");
+                throw new ValidationException("Can only close active auctions");
 
             var auctionVehicles = auction.Vehicles.ToList();
             foreach (var vehicle in auctionVehicles)
@@ -276,7 +377,7 @@ public class AuctionService : IAuctionService
     {
         var vehicle = await _vehicleRepository.GetByIdAsync(vehicleId);
         if (vehicle == null)
-            throw new InvalidOperationException(
+            throw new NotFoundException(
                 $"VehicleId {vehicleId} not found");
         
         var activeAuctions = await _auctionRepository.GetActiveAuctionsAsync();
@@ -286,7 +387,7 @@ public class AuctionService : IAuctionService
                            (a.Status == AuctionStatus.Active));
 
         if (auction == null)
-            throw new InvalidOperationException(
+            throw new NotFoundException(
                 $"Active Auction for this vehicle was not found");
         
         await _vehicleRepository.MarkVehicleAsSold(vehicle.Id, buyerId);
@@ -356,7 +457,7 @@ public class AuctionService : IAuctionService
                           ?? throw new NotFoundException($"Auction with name {request.AuctionName} not found");
             
             if (auction.Status != AuctionStatus.Active)
-                throw new InvalidOperationException("Can only add vehicles to active auctions");
+                throw new ValidationException("Can only add vehicles to active auctions");
             
             var vehiclesToAdd = new List<Vehicle>();
             foreach (var vin in request.VehicleVins)
@@ -365,10 +466,10 @@ public class AuctionService : IAuctionService
                               ?? throw new NotFoundException($"Vehicle with VIN {vin} not found");
 
                 if (!vehicle.IsAvailable)
-                    throw new InvalidOperationException($"Vehicle {vin} is not available for auction");
+                    throw new ValidationException($"Vehicle {vin} is not available for auction");
 
                 if (auction.Vehicles.Any(v => v.Id == vehicle.Id))
-                    throw new InvalidOperationException($"Vehicle {vin} is already in this auction");
+                    throw new ValidationException($"Vehicle {vin} is already in this auction");
 
                 vehiclesToAdd.Add(vehicle);
             }
@@ -401,7 +502,7 @@ public class AuctionService : IAuctionService
                           ?? throw new NotFoundException($"Auction with name {request.AuctionName} not found");
             
             if (auction.Status != AuctionStatus.Active)
-                throw new InvalidOperationException("Can only remove vehicles from active auctions");
+                throw new ValidationException("Can only remove vehicles from active auctions");
             
             foreach (var vehicleVin in request.VehicleVins)
             {
@@ -412,7 +513,7 @@ public class AuctionService : IAuctionService
                     throw new NotFoundException($"Vehicle {vehicleVin} not found in this auction");
             
                 if (auction.Bids.Any(b => b.VehicleId == vehicle.Id))
-                    throw new InvalidOperationException($"Cannot remove vehicle {vehicleVin} as it has existing bids");
+                    throw new ValidationException($"Cannot remove vehicle {vehicleVin} as it has existing bids");
             }
 
             // Remove vehicles from auction and mark them as available
@@ -448,12 +549,5 @@ public class AuctionService : IAuctionService
             _logger.LogError(ex, "Error retrieving active auctions");
             throw;
         }
-    }
-
-
-    private void ValidateAuctionDto(CreateAuctionRequest request)
-    {
-        if (string.IsNullOrWhiteSpace(request.Name))
-            throw new ValidationException("Auction name is required");
     }
 }

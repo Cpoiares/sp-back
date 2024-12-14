@@ -4,12 +4,14 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using sp_back_api.Database;
+using sp_back_api.Database.Repository;
 using sp_back_api.Database.Repository.Implementation;
 using sp_back_api.DTOs;
 using sp_back_api.Loging;
 using sp_back_api.Services;
 using sp_back_api.Services.Implementation;
 using sp_back.models.Config;
+using sp_back.models.DTOs.Requests;
 using sp_back.models.Enums;
 using sp_back.models.Exceptions;
 using sp_back.models.Models.Auction;
@@ -25,6 +27,7 @@ public class AuctionServiceTests : IDisposable
     private readonly Mock<ILogger<AuctionService>> _loggerMock;
     private readonly Mock<IAuctionLogger> _auctionLoggerMock;
     private readonly Mock<ILogger<VehicleService>> _loggerVehicleMock;
+    private readonly IAuctionRepository _auctionRepository;
     private readonly List<Vehicle> _testVehicles;
 
     public AuctionServiceTests()
@@ -41,6 +44,7 @@ public class AuctionServiceTests : IDisposable
         var appSettings = Options.Create(new AppSettings 
         { 
         });
+        _auctionRepository = auctionRepo;
         _vehicleService = new VehicleService(vehicleRepo, _loggerVehicleMock.Object);
 
         _auctionService = new AuctionService(
@@ -304,6 +308,87 @@ public class AuctionServiceTests : IDisposable
             .WithMessage("Can only close active auctions");
     }
     
+    [Fact]
+    public async Task CreateCollectiveAuction_WithValidData_ShouldCreateAuctionWithSameBidForAllVehicles()
+    {
+        // Arrange
+        var startingBid = 5000.0;
+        var request = new CreateCollectiveAuctionRequest
+        {
+            AuctionName = "Collective Test Auction",
+            EndDate = DateTime.UtcNow.AddDays(1),
+            StartingBid = startingBid,
+            VehicleVins = _testVehicles.Select(v => v.VIN).ToArray()
+        };
+
+        // Act
+        var result = await _auctionService.CreateCollectiveAuction(request);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Name.Should().Be(request.AuctionName);
+        result.IsCollectiveAuction.Should().BeTrue();
+        result.Status.Should().Be(AuctionStatus.Waiting);
+        result.Vehicles.Should().HaveCount(_testVehicles.Count);
+        result.Vehicles.Should().OnlyContain(v => v.StartingPrice == startingBid);
+    }
+    
+    [Fact]
+    public async Task PlaceBidInCollectiveAuction_WithValidBid_ShouldUpdateAllVehiclesWithSameBid()
+    {
+        // Arrange
+        var auction = await CreateTestCollectiveAuction();
+        var bidAmount = 15000.0;
+        var request = new PlaceBidInCollectiveAuctionRequest
+        {
+            AuctionName = auction.Name,
+            BidderId = "testBidder",
+            Amount = bidAmount
+        };
+
+        // Act
+        var result = await _auctionService.PlaceBidInCollectiveAuction(request);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Bids.Should().HaveCount(auction.Vehicles.Count);
+        foreach (var vehicle in result.Vehicles)
+        {
+            var highestBid = result.GetHighestBidForVehicle(vehicle.Id);
+            highestBid.Should().NotBeNull();
+            highestBid.Amount.Should().Be(bidAmount);
+            highestBid.BidderId.Should().Be(request.BidderId);
+        }
+    }
+    
+    [Fact]
+    public async Task PlaceBidInCollectiveAuction_WithLowerBid_ShouldThrowInvalidOperationException()
+    {
+        // Arrange
+        var auction = await CreateTestCollectiveAuction();
+        // Place an initial bid
+        await _auctionService.PlaceBidInCollectiveAuction(new PlaceBidInCollectiveAuctionRequest
+        {
+            AuctionName = auction.Name,
+            BidderId = "firstBidder",
+            Amount = 15000.0
+        });
+
+        var lowerBidRequest = new PlaceBidInCollectiveAuctionRequest
+        {
+            AuctionName = auction.Name,
+            BidderId = "secondBidder",
+            Amount = 14000.0  // Lower than existing bid
+        };
+
+        // Act
+        var act = () => _auctionService.PlaceBidInCollectiveAuction(lowerBidRequest);
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*Bid must be at least*");
+    }
+    
     private async Task<Auction> CreateActiveAuctionWithWinnerBid(DateTime? endTime = null)
     {
         // First create and save the auction with vehicles
@@ -356,6 +441,23 @@ public class AuctionServiceTests : IDisposable
             .Include(a => a.Vehicles)
             .Include(a => a.Bids)
             .FirstAsync(a => a.Id == auction.Id);
+    }
+    
+    private async Task<Auction> CreateTestCollectiveAuction()
+    {
+        var request = new CreateCollectiveAuctionRequest
+        {
+            AuctionName = "Test Collective Auction",
+            EndDate = DateTime.UtcNow.AddDays(1),
+            StartingBid = 10000.0,
+            VehicleVins = _testVehicles.Select(v => v.VIN).ToArray()
+        };
+
+        var auction = await _auctionService.CreateCollectiveAuction(request);
+        auction.Status = AuctionStatus.Active;
+        await _auctionRepository.UpdateAsync(auction);
+    
+        return auction;
     }
     
     private async Task<Auction> CreateCompletedAuction()

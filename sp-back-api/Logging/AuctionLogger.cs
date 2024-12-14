@@ -35,7 +35,7 @@ public class AuctionLogger : IAuctionLogger
                     vehicle.Type,
                     vehicle.StartingPrice
                 },
-                WinningBid = auction.GetHighestBidForVehicle(vehicle.Id)?.Amount,
+                WinningBid = string.IsNullOrEmpty(auction.GetHighestBidderForVehicle(vehicle.Id)) ? null : auction.GetHighestBidForVehicle(vehicle.Id)?.Amount,
                 WinningBidder = auction.GetHighestBidderForVehicle(vehicle.Id)
             })
             .ToList();

@@ -20,9 +20,6 @@ using sp_back.models.Config;
 using sp_back.models.Models.Vehicles;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
-
-// TODO: Need to add validator to each request
-// TODO: Add bulk auction endpoint
 var builder = WebApplication.CreateBuilder(args);
 var projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../.."));
 
@@ -155,6 +152,18 @@ app.MapPost("/auctions/{auctionId}/close", AuctionHandlers.CloseAuction)
 app.MapPost("/auctions/{auctionId}/start", AuctionHandlers.StartAuction)
     .WithName("StartAuction")
     .Produces<StartAuctionResponse>()
+    .ProducesProblem(StatusCodes.Status400BadRequest)
+    .ProducesProblem(StatusCodes.Status404NotFound);
+
+app.MapPost("/auctions/create-collective", AuctionHandlers.CreateCollectiveAuction)
+    .WithName("CreateCollectiveAuction")
+    .Produces<AuctionResponse>()
+    .ProducesProblem(StatusCodes.Status400BadRequest)
+    .ProducesProblem(StatusCodes.Status404NotFound);
+
+app.MapPost("/auctions/collective-bid", AuctionHandlers.PlaceBidInCollectiveAuction)
+    .WithName("PlaceCollectiveBid")
+    .Produces<AuctionResponse>()
     .ProducesProblem(StatusCodes.Status400BadRequest)
     .ProducesProblem(StatusCodes.Status404NotFound);
 

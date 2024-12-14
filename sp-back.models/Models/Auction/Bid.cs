@@ -4,7 +4,7 @@ namespace sp_back.models.Models.Auction;
 
 public class Bid : IComparable<Bid>
 {
-    public Guid Id { get; set; }
+    public Guid? Id { get; set; }
     public string BidderId { get; set; }
     public double Amount { get; set; }
     public DateTime? BidTime { get; set; }

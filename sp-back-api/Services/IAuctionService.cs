@@ -1,4 +1,5 @@
 ﻿using sp_back_api.DTOs;
+using sp_back.models.DTOs.Requests;
 using sp_back.models.Models.Auction;
 
 namespace sp_back_api.Services;
@@ -16,5 +17,6 @@ public interface IAuctionService
     Task<Auction> RemoveVehiclesFromAuctionAsync(RemoveVehiclesFromAuctionRequest request);
     Task<IEnumerable<Auction>> GetAllAuctionsAsync();
     Task<Auction> StartAuctionAsync(string auctionName);
-
+    Task<Auction> CreateCollectiveAuction(CreateCollectiveAuctionRequest request);
+    Task<Auction> PlaceBidInCollectiveAuction(PlaceBidInCollectiveAuctionRequest request);
 }

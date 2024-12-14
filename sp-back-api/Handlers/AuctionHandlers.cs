@@ -138,4 +138,33 @@ public static class AuctionHandlers
         }
         var auction = await auctionService.StartAuctionAsync(request.AuctionName);
         return Results.Ok(AuctionResponseHandler.BuildStartResponse(auction));
-    }}
+    }
+
+    public static async Task<IResult> CreateCollectiveAuction(
+        [FromBody] CreateCollectiveAuctionRequest request, 
+        IValidator<CreateCollectiveAuctionRequest> validator,
+        IAuctionService auctionService)
+    {
+        var validationResult = await validator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
+        var auction = await auctionService.CreateCollectiveAuction(request);
+        return Results.Ok(AuctionResponseHandler.BuildStartResponse(auction));
+    }
+    
+    public static async Task<IResult> PlaceBidInCollectiveAuction(
+        [FromBody] PlaceBidInCollectiveAuctionRequest request, 
+        IValidator<PlaceBidInCollectiveAuctionRequest> validator,
+        IAuctionService auctionService)
+    {
+        var validationResult = await validator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
+        var auction = await auctionService.PlaceBidInCollectiveAuction(request);
+        return Results.Ok(AuctionResponseHandler.BuildStartResponse(auction));
+    }
+}

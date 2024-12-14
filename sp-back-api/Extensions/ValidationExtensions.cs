@@ -18,6 +18,8 @@ public static class ValidationExtensions
         services.AddValidatorsFromAssemblyContaining<StartAuctionValidator>();
         services.AddValidatorsFromAssemblyContaining<UpdateVehicleValidator>();
         services.AddValidatorsFromAssemblyContaining<PlaceBidValidator>();
+        services.AddValidatorsFromAssemblyContaining<CreateCollectiveAuctionRequestValidator>();
+        services.AddValidatorsFromAssemblyContaining<PlaceBidInCollectiveAuctionValidator>();
 
         return services;
     }

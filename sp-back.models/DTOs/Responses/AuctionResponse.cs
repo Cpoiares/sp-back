@@ -17,7 +17,7 @@ public record AuctionVehicles
 {
     public string Name { get; set; }
     public string VIN { get; set; }
-    public double WinningBid { get; set; }
-    public string BidderId { get; set; }
+    public double? WinningBid { get; set; }
+    public string? BidderId { get; set; }
     public double VehicleStartingPrice { get; set; }
 }

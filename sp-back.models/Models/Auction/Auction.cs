@@ -5,11 +5,11 @@ namespace sp_back.models.Models.Auction;
 
 public class Auction
 {
-    private readonly SortedSet<Bid> _bids;
+    private readonly List<Bid> _bids;
     public virtual List<Vehicle> Vehicles { get; set; } = [];
     public Auction()
     {
-        _bids = new SortedSet<Bid>(Comparer<Bid>.Create((a, b) => b.Amount.CompareTo(a.Amount))); // Descending order
+        _bids = new List<Bid>();
     }
 
     public Guid Id { get; set; }
@@ -18,6 +18,7 @@ public class Auction
     public DateTime? EndTime { get; set; }
     public AuctionStatus Status { get; set; }
     public IReadOnlyCollection<Bid> Bids => _bids;
+    public bool IsCollectiveAuction { get; set; }
     
     public Bid? GetHighestBidForVehicle(Guid vehicleId)
     {
@@ -58,7 +59,7 @@ public class Auction
             .Where(b => b.VehicleId == vehicleId)
             .MaxBy(b => b.Amount);
 
-        return highestBid?.BidderId; // Returns null if no bids exist
+        return highestBid?.BidderId; 
     }
 }
     
