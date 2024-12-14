@@ -1,6 +1,6 @@
-﻿namespace sp_back_api.DTOs.Responses;
+﻿namespace sp_back.models.DTOs.Responses;
 
 public record GetAllActiveAuctionsResponse
 {
-    public List<AuctionResponse> ActiveAuctions { get; set; }
+    public List<AuctionResponse> Auctions { get; set; } = [];
 }

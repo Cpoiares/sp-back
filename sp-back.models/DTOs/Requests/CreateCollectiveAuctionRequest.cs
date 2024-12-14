@@ -4,9 +4,8 @@ namespace sp_back.models.DTOs.Requests;
 
 public class CreateCollectiveAuctionRequest
 {
-    public string AuctionName { get; init; }
     public DateTime? EndDate { get; init; }
-    public string[] VehicleVins { get; init; } = {};
+    public string[] VehicleVins { get; init; } = [];
     public double StartingBid { get; init; }
 }
 
@@ -14,9 +13,6 @@ public class CreateCollectiveAuctionRequestValidator : AbstractValidator<CreateC
 {
     public CreateCollectiveAuctionRequestValidator()
     {
-        RuleFor(x => x.AuctionName)
-            .NotEmpty()
-            .WithMessage("Auction name is required");
         
         RuleFor(x => x.VehicleVins)
             .NotNull()

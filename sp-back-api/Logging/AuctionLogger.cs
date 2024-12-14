@@ -1,8 +1,9 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Options;
-using sp_back_api.Loging;
 using sp_back.models.Config;
 using sp_back.models.Models.Auction;
+
+namespace sp_back_api.Logging;
 
 public class AuctionLogger : IAuctionLogger
 {
@@ -16,11 +17,11 @@ public class AuctionLogger : IAuctionLogger
         var logDirectory = Path.GetDirectoryName(_logPath);
         if (!Directory.Exists(logDirectory))
         {
-            Directory.CreateDirectory(logDirectory);
+            if (logDirectory != null) Directory.CreateDirectory(logDirectory);
         }    
     }
 
-    public async Task LogAuctionCompleted(Auction auction)
+    public Task LogAuctionCompleted(Auction auction)
     {
         var soldVehicles = auction.Vehicles
             .Where(v => auction.GetHighestBidderForVehicle(v.Id) != null)
@@ -35,7 +36,7 @@ public class AuctionLogger : IAuctionLogger
                     vehicle.Type,
                     vehicle.StartingPrice
                 },
-                WinningBid = string.IsNullOrEmpty(auction.GetHighestBidderForVehicle(vehicle.Id)) ? null : auction.GetHighestBidForVehicle(vehicle.Id)?.Amount,
+                WinningBid = string.IsNullOrEmpty(auction.GetHighestBidderForVehicle(vehicle.Id)) ? 0.0 : auction.GetHighestBidForVehicle(vehicle.Id).Amount,
                 WinningBidder = auction.GetHighestBidderForVehicle(vehicle.Id)
             })
             .ToList();
@@ -44,9 +45,8 @@ public class AuctionLogger : IAuctionLogger
         {
             Timestamp = DateTime.UtcNow,
             AuctionId = auction.Id,
-            AuctionName = auction.Name,
-            StartTime = auction.StartTime,
-            EndTime = auction.EndTime,
+            auction.StartTime,
+            auction.EndTime,
             TotalVehicles = auction.Vehicles.Count,
             SoldVehicles = soldVehicles.Count,
             SoldVehicleDetails = soldVehicles
@@ -61,5 +61,7 @@ public class AuctionLogger : IAuctionLogger
         {
             File.AppendAllText(_logPath, logLine + Environment.NewLine);
         }
+
+        return Task.CompletedTask;
     }
 }

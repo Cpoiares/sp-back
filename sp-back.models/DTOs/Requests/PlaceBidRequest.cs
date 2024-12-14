@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace sp_back_api.DTOs;
+namespace sp_back.models.DTOs.Requests;
 
 public record PlaceBidRequest
 {

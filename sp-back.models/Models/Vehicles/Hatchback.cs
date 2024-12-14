@@ -1,26 +1,46 @@
-﻿using sp_back_api.DTOs.Responses;
+﻿using sp_back.models.DTOs.Responses;
 using sp_back.models.Enums;
 
 namespace sp_back.models.Models.Vehicles;
 
 public class Hatchback : Vehicle
 {
+    public Hatchback(string make, string model, DateTime productionDate, double startingPrice, string vin, uint numberOfDoors) : base(make, model, productionDate, startingPrice, vin)
+    {
+        NumberOfDoors = numberOfDoors;
+        Type = VehicleType.Hatchback;
+    }
+
     public uint NumberOfDoors { get; set; }
     public override VehicleResponse GetVehicleResponses()
     {
-        return new VehicleResponse()
+        return new GetVehicleSedanHatchbackResponse()
         {
             Id = Id,
-            Vin = VIN,
+            Vin = Vin,
             Make = Make,
             Model = Model,
             NumberOfDoors = NumberOfDoors,
             Available = IsAvailable,
-            VehicleType = VehicleType.Hatchback,
             Sold = IsSold,
             StartingPrice = StartingPrice,
-            AuctionId = Auction?.Id ?? null,
-            BidderId = IsSold ? Auction.GetHighestBidderForVehicle(Id) : null
+            AuctionId = Auction?.Id,
+            BidderId = GetBidderId()
         };
+    }
+    
+    private string? GetBidderId()
+    {
+        if (!IsSold || Auction == null)
+            return null;
+        
+        try
+        {
+            return Auction.GetHighestBidderForVehicle(Id);
+        }
+        catch
+        {
+            return null;
+        }
     }
 }

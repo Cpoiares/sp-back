@@ -1,29 +1,24 @@
-﻿using sp_back_api.DTOs.Responses;
+﻿using sp_back.models.DTOs.Responses;
 using sp_back.models.Enums;
-using sp_back.models.Exceptions;
 
 namespace sp_back.models.Models.Vehicles;
 
 public class Truck : Vehicle
 {
-    public double LoadCapacity { get; set; }
-    public TruckInfo GetTruckInfo()
+    public Truck(string make, string model, DateTime productionDate, double startingPrice, string vin, double loadCapacity) : base(make, model, productionDate, startingPrice, vin)
     {
-        return new TruckInfo()
-        {
-            LoadCapacity = LoadCapacity,
-            Make = Make,
-            Model = Model,
-            ProductionDate = ProductionDate.ToString()
-        };
+        LoadCapacity = loadCapacity;
+        Type = VehicleType.Truck;
     }
+
+    public double LoadCapacity { get; set; }
 
     public override VehicleResponse GetVehicleResponses()
     {
-        return new VehicleResponse()
+        return new GetVehicleTruckResponse()
         {
             Id = Id,
-            Vin = VIN,
+            Vin = Vin,
             Make = Make,
             Model = Model,
             LoadCapacity = LoadCapacity,
@@ -31,16 +26,23 @@ public class Truck : Vehicle
             VehicleType = VehicleType.Truck,
             Sold = IsSold,
             StartingPrice = StartingPrice,
-            AuctionId = Auction?.Id ?? null,
-            BidderId = IsSold ? Auction.GetHighestBidderForVehicle(Id) : null
+            AuctionId = Auction?.Id,
+            BidderId = GetBidderId()
         };    
     }
-}
-
-public class TruckInfo
-{
-    public double LoadCapacity { get; set; }
-    public string Make { get; set;}
-    public string Model { get; set;}
-    public string ProductionDate { get; set;}
+    
+    private string? GetBidderId()
+    {
+        if (!IsSold || Auction == null)
+            return null;
+        
+        try
+        {
+            return Auction.GetHighestBidderForVehicle(Id);
+        }
+        catch
+        {
+            return null;
+        }
+    }
 }

@@ -6,8 +6,7 @@ using Moq;
 using sp_back_api.Database;
 using sp_back_api.Database.Repository;
 using sp_back_api.Database.Repository.Implementation;
-using sp_back_api.DTOs;
-using sp_back_api.Loging;
+using sp_back_api.Logging;
 using sp_back_api.Services;
 using sp_back_api.Services.Implementation;
 using sp_back.models.Config;
@@ -19,41 +18,37 @@ using sp_back.models.Models.Vehicles;
 using sp_back.tests.Helpers;
 using Xunit;
 
+namespace sp_back.tests.ServiceTests;
+
 public class AuctionServiceTests : IDisposable
 {
     private readonly AuctionDbContext _context;
     private readonly IAuctionService _auctionService;
-    private readonly IVehicleService _vehicleService;
-    private readonly Mock<ILogger<AuctionService>> _loggerMock;
     private readonly Mock<IAuctionLogger> _auctionLoggerMock;
-    private readonly Mock<ILogger<VehicleService>> _loggerVehicleMock;
     private readonly IAuctionRepository _auctionRepository;
     private readonly List<Vehicle> _testVehicles;
 
     public AuctionServiceTests()
     {
         _context = new AuctionDbContext(TestDatabaseHelper.GetInMemoryDbOptions(Guid.NewGuid().ToString()));
-        _loggerMock = new Mock<ILogger<AuctionService>>();
-        _loggerVehicleMock = new Mock<ILogger<VehicleService>>();
+        Mock<ILogger<AuctionService>> loggerMock = new();
+        Mock<ILogger<VehicleService>> loggerVehicleMock = new();
 
         _auctionLoggerMock = new Mock<IAuctionLogger>();
 
 
         var auctionRepo = new AuctionRepository(_context, new Mock<ILogger<AuctionRepository>>().Object);
         var vehicleRepo = new VehicleRepository(_context, new Mock<ILogger<VehicleRepository>>().Object);
-        var appSettings = Options.Create(new AppSettings 
-        { 
-        });
+        Options.Create(new AppSettings());
         _auctionRepository = auctionRepo;
-        _vehicleService = new VehicleService(vehicleRepo, _loggerVehicleMock.Object);
+        IVehicleService vehicleService = new VehicleService(vehicleRepo, loggerVehicleMock.Object);
 
         _auctionService = new AuctionService(
             auctionRepo,
             vehicleRepo,
             _auctionLoggerMock.Object,
-            appSettings,
-            _loggerMock.Object,
-            _vehicleService);
+            loggerMock.Object,
+            vehicleService);
 
         _testVehicles = SeedTestVehicles();
     }
@@ -62,31 +57,8 @@ public class AuctionServiceTests : IDisposable
     {
         var vehicles = new List<Vehicle>
         {
-            new Sedan()
-            {
-                Id = Guid.NewGuid(),
-                Make = "Test1",
-                Model = "Car1",     
-                NumberOfDoors = 4,
-                ProductionDate = DateTime.Today.AddMonths(-1),       
-                Type = VehicleType.Sedan,
-                StartingPrice = 10000,
-                IsAvailable = true,
-                VIN = "1"
-                
-            },
-            new Sedan()
-            {
-                Id = Guid.NewGuid(),
-                Make = "Test2",
-                Model = "Car2",     
-                NumberOfDoors = 2,
-                ProductionDate = DateTime.Today.AddMonths(-2),       
-                Type = VehicleType.Sedan,
-                StartingPrice = 15000,
-                IsAvailable = true,
-                VIN = "2"
-            }
+            new Sedan("TestSedan1", "Car1", DateTime.Today.AddMonths(-1), 10000, "VINNUMBER1", 4),
+            new Sedan("Test2", "Car2", DateTime.Today.AddMonths(-2), 15000, "VINNUMBER2", 4)
         };
 
         _context.Vehicles.AddRange(vehicles);
@@ -101,8 +73,7 @@ public class AuctionServiceTests : IDisposable
         // Arrange
         var request = new CreateAuctionRequest
         {
-            Name = "Test Auction",
-            VehicleVins = _testVehicles.Select(v => v.VIN).ToArray()
+            VehicleVins = _testVehicles.Select(v => v.Vin).ToArray()
         };
 
         // Act
@@ -110,9 +81,8 @@ public class AuctionServiceTests : IDisposable
 
         // Assert
         result.Should().NotBeNull();
-        result.Name.Should().Be(request.Name);
         result.Vehicles.Should().HaveCount(2);
-        result.Vehicles.Should().Contain(v => _testVehicles.Select(Vehicle => v.Id).Contains(v.Id));
+        result.Vehicles.Should().Contain(v => _testVehicles.Select(vehicle => v.Id).Contains(v.Id));
     }
     
     [Fact]
@@ -121,8 +91,7 @@ public class AuctionServiceTests : IDisposable
         // Arrange
         var request = new CreateAuctionRequest
         {
-            Name = "Test Auction",
-            VehicleVins = new[] { Guid.NewGuid().ToString() }
+            VehicleVins = new[] { "testVin1" }
         };
 
         // Act
@@ -137,13 +106,12 @@ public class AuctionServiceTests : IDisposable
     {
         // Arrange
         var vehicle = await _context.Vehicles.FindAsync(_testVehicles[0].Id);
-        vehicle.IsAvailable = false;
+        if (vehicle != null) vehicle.IsAvailable = false;
         await _context.SaveChangesAsync();
 
         var request = new CreateAuctionRequest
         {
-            Name = "Test Auction",
-            VehicleVins = _testVehicles.Select(v => v.VIN).ToArray()
+            VehicleVins = _testVehicles.Select(v => v.Vin).ToArray()
         };
 
         // Act
@@ -158,13 +126,13 @@ public class AuctionServiceTests : IDisposable
     public async Task PlaceBid_WithValidBid_ShouldUpdateAuctionWithNewBid()
     {
         // Arrange
-        var auction = await CreateActiveAuction();
+        await CreateActiveAuction();
         var vehicle = _testVehicles[0];
         var request = new PlaceBidRequest
         {
             BidderId = "testUser",
             Amount = 10500,
-            VehicleVin = vehicle.VIN,
+            VehicleVin = vehicle.Vin,
         };
 
         // Act
@@ -187,7 +155,7 @@ public class AuctionServiceTests : IDisposable
         {
             BidderId = "testUser",
             Amount = 10500,
-            VehicleVin = _testVehicles[0].VIN,
+            VehicleVin = _testVehicles[0].Vin,
         };
 
         // Act
@@ -201,12 +169,12 @@ public class AuctionServiceTests : IDisposable
     public async Task PlaceBid_OnCompletedAuction_ShouldThrowInvalidOperationException()
     {
         // Arrange
-        var auction = await CreateCompletedAuction();
+        await CreateCompletedAuction();
         var request = new PlaceBidRequest
         {
             BidderId = "testUser",
             Amount = 10500,
-            VehicleVin = _testVehicles[0].VIN
+            VehicleVin = _testVehicles[0].Vin
         };
 
         // Act
@@ -216,12 +184,10 @@ public class AuctionServiceTests : IDisposable
         await act.Should().ThrowAsync<NotFoundException>();
     }
 
-    private async Task<Auction> CreateActiveAuction(DateTime? endTime = null)
+    private async Task CreateActiveAuction(DateTime? endTime = null)
     {
         var auction = new Auction
         {
-            Id = Guid.NewGuid(),
-            Name = "Test Auction",
             StartTime = DateTime.UtcNow.AddHours(-1),
             EndTime = endTime ?? DateTime.UtcNow.AddDays(1),
             Status = AuctionStatus.Active,
@@ -231,7 +197,6 @@ public class AuctionServiceTests : IDisposable
         _context.Auctions.Add(auction);
         await _context.SaveChangesAsync();
         _context.ChangeTracker.Clear();
-        return auction;
     }
     
     [Fact]
@@ -241,7 +206,7 @@ public class AuctionServiceTests : IDisposable
         var auction = await CreateActiveAuctionWithWinnerBid();
 
         // Act
-        var result = await _auctionService.CancelAuctionAsync(auction.Name);
+        var result = await _auctionService.CancelAuctionAsync(auction.Id);
 
         // Assert
         result.Status.Should().Be(AuctionStatus.Cancelled);
@@ -251,7 +216,7 @@ public class AuctionServiceTests : IDisposable
         foreach (var vehicle in result.Vehicles)
         {
             var updatedVehicle = await _context.Vehicles.FindAsync(vehicle.Id);
-            updatedVehicle.IsAvailable.Should().BeTrue();
+            updatedVehicle?.IsAvailable.Should().BeTrue();
         }
     }
     
@@ -262,7 +227,7 @@ public class AuctionServiceTests : IDisposable
         var auction = await CreateCompletedAuction();
 
         // Act
-        var act = () => _auctionService.CancelAuctionAsync(auction.Name);
+        var act = () => _auctionService.CancelAuctionAsync(auction.Id);
 
         // Assert
         await act.Should().ThrowAsync<ValidationException>()
@@ -276,7 +241,7 @@ public class AuctionServiceTests : IDisposable
         var auction = await CreateActiveAuctionWithWinnerBid();
 
         // Act
-        var result = await _auctionService.CloseAuctionAsync(auction.Name);
+        var result = await _auctionService.CloseAuctionAsync(auction.Id);
 
         // Assert
         result.Status.Should().Be(AuctionStatus.Completed);
@@ -284,11 +249,11 @@ public class AuctionServiceTests : IDisposable
 
         // Verify vehicles with winning bids are marked as sold
         var vehicleWithBid = await _context.Vehicles.FindAsync(_testVehicles[0].Id);
-        vehicleWithBid.IsAvailable.Should().BeFalse();
+        vehicleWithBid?.IsAvailable.Should().BeFalse();
 
         // Verify vehicles without bids remain available
         var vehicleWithoutBid = await _context.Vehicles.FindAsync(_testVehicles[1].Id);
-        vehicleWithoutBid.IsAvailable.Should().BeTrue();
+        vehicleWithoutBid?.IsAvailable.Should().BeTrue();
 
         _auctionLoggerMock.Verify(x => x.LogAuctionCompleted(
                 It.Is<Auction>(a => a.Id == auction.Id)), 
@@ -302,7 +267,7 @@ public class AuctionServiceTests : IDisposable
         var auction = await CreateCompletedAuction();
 
         // Act & Assert
-        var act = async () => await _auctionService.CloseAuctionAsync(auction.Name);
+        var act = async () => await _auctionService.CloseAuctionAsync(auction.Id);
     
         await act.Should().ThrowAsync<ValidationException>()
             .WithMessage("Can only close active auctions");
@@ -315,10 +280,9 @@ public class AuctionServiceTests : IDisposable
         var startingBid = 5000.0;
         var request = new CreateCollectiveAuctionRequest
         {
-            AuctionName = "Collective Test Auction",
             EndDate = DateTime.UtcNow.AddDays(1),
             StartingBid = startingBid,
-            VehicleVins = _testVehicles.Select(v => v.VIN).ToArray()
+            VehicleVins = _testVehicles.Select(v => v.Vin).ToArray()
         };
 
         // Act
@@ -326,11 +290,10 @@ public class AuctionServiceTests : IDisposable
 
         // Assert
         result.Should().NotBeNull();
-        result.Name.Should().Be(request.AuctionName);
         result.IsCollectiveAuction.Should().BeTrue();
         result.Status.Should().Be(AuctionStatus.Waiting);
         result.Vehicles.Should().HaveCount(_testVehicles.Count);
-        result.Vehicles.Should().OnlyContain(v => v.StartingPrice == startingBid);
+        result.Vehicles.Should().OnlyContain(v => Math.Abs(v.StartingPrice - startingBid) < 0.0001);
     }
     
     [Fact]
@@ -341,7 +304,7 @@ public class AuctionServiceTests : IDisposable
         var bidAmount = 15000.0;
         var request = new PlaceBidInCollectiveAuctionRequest
         {
-            AuctionName = auction.Name,
+            AuctionId = auction.Id,
             BidderId = "testBidder",
             Amount = bidAmount
         };
@@ -369,14 +332,14 @@ public class AuctionServiceTests : IDisposable
         // Place an initial bid
         await _auctionService.PlaceBidInCollectiveAuction(new PlaceBidInCollectiveAuctionRequest
         {
-            AuctionName = auction.Name,
+            AuctionId = auction.Id,
             BidderId = "firstBidder",
             Amount = 15000.0
         });
 
         var lowerBidRequest = new PlaceBidInCollectiveAuctionRequest
         {
-            AuctionName = auction.Name,
+            AuctionId = auction.Id,
             BidderId = "secondBidder",
             Amount = 14000.0  // Lower than existing bid
         };
@@ -394,8 +357,6 @@ public class AuctionServiceTests : IDisposable
         // First create and save the auction with vehicles
         var auction = new Auction
         {
-            Id = Guid.NewGuid(),
-            Name = "Test Auction",
             StartTime = DateTime.UtcNow.AddHours(-1),
             EndTime = endTime ?? DateTime.UtcNow.AddDays(1),
             Status = AuctionStatus.Active
@@ -424,15 +385,7 @@ public class AuctionServiceTests : IDisposable
             .Include(a => a.Bids)
             .FirstAsync(a => a.Id == auction.Id);
 
-        var bid = new Bid
-        {
-            Id = Guid.NewGuid(),
-            BidderId = "winner1",
-            Amount = 999999999.0,
-            BidTime = DateTime.UtcNow,
-            AuctionId = auction.Id,
-            VehicleId = vehicles[0].Id
-        };
+        var bid = new Bid("winner1", vehicles[0], auction, 99999999999.0);
 
         _context.Bids.Add(bid);
         await _context.SaveChangesAsync();
@@ -447,10 +400,9 @@ public class AuctionServiceTests : IDisposable
     {
         var request = new CreateCollectiveAuctionRequest
         {
-            AuctionName = "Test Collective Auction",
             EndDate = DateTime.UtcNow.AddDays(1),
             StartingBid = 10000.0,
-            VehicleVins = _testVehicles.Select(v => v.VIN).ToArray()
+            VehicleVins = _testVehicles.Select(v => v.Vin).ToArray()
         };
 
         var auction = await _auctionService.CreateCollectiveAuction(request);
@@ -464,8 +416,6 @@ public class AuctionServiceTests : IDisposable
     {
         var auction = new Auction
         {
-            Id = Guid.NewGuid(),
-            Name = "Test Auction",
             StartTime = DateTime.UtcNow.AddHours(-2),
             EndTime = DateTime.UtcNow.AddDays(-1),
             Status = AuctionStatus.Completed,

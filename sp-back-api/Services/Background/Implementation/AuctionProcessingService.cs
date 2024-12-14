@@ -28,7 +28,7 @@ public class AuctionProcessingService : BackgroundService
         {
             try
             {
-                await ProcessAuctions(stoppingToken);
+                await ProcessAuctions();
                 await Task.Delay(TimeSpan.FromSeconds(
                     _appSettings.Auction.AuctionProcessingIntervalInSeconds), 
                     stoppingToken);
@@ -41,7 +41,7 @@ public class AuctionProcessingService : BackgroundService
         }
     }
 
-    private async Task ProcessAuctions(CancellationToken stoppingToken)
+    private async Task ProcessAuctions()
     { 
         using var scope = _scopeFactory.CreateScope();
         var auctionService = scope.ServiceProvider.GetRequiredService<IAuctionService>();

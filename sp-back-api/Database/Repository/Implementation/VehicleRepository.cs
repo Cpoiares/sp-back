@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using sp_back.models.DTOs.Requests;
 using sp_back.models.Exceptions;
-using sp_back.models.Models;
 using sp_back.models.Models.Vehicles;
 
 namespace sp_back_api.Database.Repository.Implementation;
@@ -17,12 +17,12 @@ public class VehicleRepository : IVehicleRepository
         _logger = logger;
     }
 
-    public async Task<Vehicle> GetByIdAsync(Guid id)
+    public async Task<Vehicle?> GetByIdAsync(int id)
     {
         try
         {
             return await _context.Vehicles
-                .FirstOrDefaultAsync(v => v.Id == id) ?? throw new NotFoundException("No vehicles found");
+                .FirstOrDefaultAsync(v => v.Id == id);
         }
         catch (Exception ex)
         {
@@ -31,12 +31,12 @@ public class VehicleRepository : IVehicleRepository
         }
     }
 
-    public async Task<Vehicle> GetByVINAsync(string vin)
+    public async Task<Vehicle?> GetByVinAsync(string vin)
     {
         try
         {
             return await _context.Vehicles
-                .FirstOrDefaultAsync(v => v.VIN == vin) ?? throw new NotFoundException("No vehicles found");
+                .FirstOrDefaultAsync(v => v.Vin == vin);
         }
         catch (Exception ex)
         {
@@ -127,7 +127,7 @@ public class VehicleRepository : IVehicleRepository
         }
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(int id)
     {
         try
         {
@@ -147,14 +147,15 @@ public class VehicleRepository : IVehicleRepository
 
     public bool CheckIfVinExists(string requestVin)
     {
-        return _context.Vehicles.Any(v => v.VIN == requestVin);
+        return _context.Vehicles.Any(v => v.Vin == requestVin);
     }
 
-    public Task MarkVehicleAsSold(Guid vehicleId, string buyerId)
+    public Task MarkVehicleAsSold(int vehicleId, string buyerId)
     {
         try
         {
             var vehicle = _context.Vehicles.Find(vehicleId);
+            if(vehicle == null) throw new NotFoundException($"Vehicle with ID {vehicleId} not found");
             vehicle.BuyerId = buyerId;
             _context.Vehicles.Update(vehicle);
             return _context.SaveChangesAsync();

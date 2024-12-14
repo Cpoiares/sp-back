@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sp-back.tests", "sp-back.tests\sp-back.tests.csproj", "{2656C11E-AEDC-482B-ACA7-31AFA76AE116}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sp-back.models", "sp-back.models\sp-back.models.csproj", "{2AF3BDE6-BE25-422A-AA67-DA1CA42F9BFD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sp-back-api", "sp-back-api\sp-back-api.csproj", "{EFA68C06-4DF6-45BD-8A1D-736E92E37DB5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2656C11E-AEDC-482B-ACA7-31AFA76AE116}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2656C11E-AEDC-482B-ACA7-31AFA76AE116}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2656C11E-AEDC-482B-ACA7-31AFA76AE116}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2656C11E-AEDC-482B-ACA7-31AFA76AE116}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AF3BDE6-BE25-422A-AA67-DA1CA42F9BFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AF3BDE6-BE25-422A-AA67-DA1CA42F9BFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AF3BDE6-BE25-422A-AA67-DA1CA42F9BFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AF3BDE6-BE25-422A-AA67-DA1CA42F9BFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFA68C06-4DF6-45BD-8A1D-736E92E37DB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFA68C06-4DF6-45BD-8A1D-736E92E37DB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFA68C06-4DF6-45BD-8A1D-736E92E37DB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFA68C06-4DF6-45BD-8A1D-736E92E37DB5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

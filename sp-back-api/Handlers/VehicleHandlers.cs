@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using sp_back_api.DTOs;
 using sp_back_api.Services;
-using sp_back.models.Models;
+using sp_back.models.DTOs.Requests;
+using sp_back.models.DTOs.Responses;
 
 namespace sp_back_api.Handlers;
 
@@ -23,24 +23,66 @@ public static class VehicleHandlers
     }
 
     public static async Task<IResult> GetVehicleById(
-        [FromQuery] Guid id, 
+        [FromQuery] int id, 
         IVehicleService vehicleService)
     {
         var vehicle = await vehicleService.GetVehicleAsync(id);
         return Results.Ok(vehicle.GetVehicleResponses());
     }
 
-    public static async Task<IResult> CreateVehicle(
-        [FromBody] CreateVehicleRequest request, 
+    public static async Task<IResult> CreateSedan(
+        [FromBody] CreateVehicleSedanHatchbackRequest request, 
         IVehicleService vehicleService, 
-        IValidator<CreateVehicleRequest> validator)
+        IValidator<CreateVehicleSedanHatchbackRequest> validator)
     {
         var validationResult = await validator.ValidateAsync(request);
         if (!validationResult.IsValid)
         {
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
-        var vehicle = await vehicleService.CreateVehicleAsync(request);
+        var vehicle = await vehicleService.CreateSedanAsync(request);
+        return Results.Created($"/vehicles/{vehicle.Id}", vehicle.GetVehicleResponses());
+    }
+    
+    public static async Task<IResult> CreateHatchback(
+        [FromBody] CreateVehicleSedanHatchbackRequest request, 
+        IVehicleService vehicleService, 
+        IValidator<CreateVehicleSedanHatchbackRequest> validator)
+    {
+        var validationResult = await validator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
+        var vehicle = await vehicleService.CreateHatchbackAsync(request);
+        return Results.Created($"/vehicles/{vehicle.Id}", vehicle.GetVehicleResponses());
+    }
+    
+    public static async Task<IResult> CreateTruck(
+        [FromBody] CreateVehicleTruckRequest request, 
+        IVehicleService vehicleService, 
+        IValidator<CreateVehicleTruckRequest> validator)
+    {
+        var validationResult = await validator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
+        var vehicle = await vehicleService.CreateTruckAsync(request);
+        return Results.Created($"/vehicles/{vehicle.Id}", vehicle.GetVehicleResponses());
+    }
+    
+    public static async Task<IResult> CreateSuv(
+        [FromBody] CreateVehicleSuvRequest request, 
+        IVehicleService vehicleService, 
+        IValidator<CreateVehicleSuvRequest> validator)
+    {
+        var validationResult = await validator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
+        var vehicle = await vehicleService.CreateSuvAsync(request);
         return Results.Created($"/vehicles/{vehicle.Id}", vehicle.GetVehicleResponses());
     }
 
@@ -72,4 +114,5 @@ public static class VehicleHandlers
         await vehicleService.DeleteVehicleAsync(request);
         return Results.NoContent();
     }
+
 }

@@ -17,14 +17,14 @@ public class AuctionRepository : IAuctionRepository
         _logger = logger;
     }
 
-    public async Task<Auction> GetByIdAsync(Guid id)
+    public async Task<Auction?> GetByIdAsync(int id)
     {
         try
         {
             return await _context.Auctions
                 .Include(a => a.Vehicles)
                 .Include(a => a.Bids)
-                .FirstOrDefaultAsync(a => a.Id == id);
+                .FirstOrDefaultAsync(a => a.Id == id) ?? throw new NotFoundException("Could not find auction");
         }
         catch (Exception ex)
         {
@@ -50,7 +50,7 @@ public class AuctionRepository : IAuctionRepository
         }
     }
 
-    public async Task<Auction> GetActiveAuctionByVehicleIdAsync(Guid vehicleId)
+    public async Task<Auction?> GetActiveAuctionByVehicleIdAsync(int vehicleId)
     {
         try
         {
@@ -132,7 +132,7 @@ public class AuctionRepository : IAuctionRepository
         }
     }
 
-    public async Task RemoveBidsForAuctionAsync(Guid auctionId)
+    public async Task RemoveBidsForAuctionAsync(int auctionId)
     {
         var bidsToRemove = await _context.Bids
             .Where(b => b.AuctionId == auctionId)
@@ -174,11 +174,11 @@ public class AuctionRepository : IAuctionRepository
         }    
     }
 
-    public async Task<Auction> StartAuction(string auctionName)
+    public async Task<Auction> StartAuction(int id)
     {
         try
         {
-            var auction = _context.Auctions.FirstOrDefault(a => a.Name == auctionName);
+            var auction = _context.Auctions.First(a => a.Id == id);
             auction.Status = AuctionStatus.Active;
             auction.StartTime = DateTime.Now;
             _context.Auctions.Update(auction);
@@ -187,17 +187,17 @@ public class AuctionRepository : IAuctionRepository
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error trying to start auction with name: {auctionName}", auctionName);
+            _logger.LogError(ex, "Error trying to start auction with name: {id}", id);
             throw;
         }
   
     }
 
-    public Task CloseAuctionAsync(Guid auctionId)
+    public Task CloseAuctionAsync(int auctionId)
     {
         try
         {
-            var auction = _context.Auctions.FirstOrDefault(a => a.Id == auctionId);
+            var auction = _context.Auctions.First(a => a.Id == auctionId);
             auction.Status = AuctionStatus.Completed;
             auction.EndTime = DateTime.Now;
             _context.Auctions.Update(auction);
@@ -209,19 +209,19 @@ public class AuctionRepository : IAuctionRepository
             throw;
         }
     }
-
-    public async Task<Auction> GetAuctionByNameAsync(string auctionName)
+    
+    public async Task<Auction> GetAuctionByIdAsync(int id)
     {
         try
         {
             return await _context.Auctions
                 .Include(a => a.Vehicles)
                 .Include(a => a.Bids)
-                .FirstAsync(a => a.Name == auctionName);
+                .FirstAsync(a => a.Id == id);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving auction with name: {auctionName}", auctionName);
+            _logger.LogError(ex, "Error retrieving auction with id: {id}", id);
             throw;
         }    
     }

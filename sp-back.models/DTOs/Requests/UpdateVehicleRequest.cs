@@ -1,20 +1,20 @@
 ﻿using FluentValidation;
 using sp_back.models.Enums;
 
-namespace sp_back_api.DTOs;
+namespace sp_back.models.DTOs.Requests;
 
 public record UpdateVehicleRequest
 {
-    public Guid Id { get; set; }
-    public string? Make { get; init; }
-    public string? Model { get; init; }
-    public DateTime? ProductionDate { get; init; }
-    public uint? NumberOfDoors { get; init; }
-    public uint? NumberOfSeats { get; init; }
-    public double? LoadCapacity { get; init;}
-    public VehicleType? Type { get; init; }
-    public double? StartingPrice { get; init; }
-    public string? VIN { get; init; }
+
+    public int Id { get; set; }
+    public string? Make { get; set; }
+    public string? Model { get; set; }
+    public DateTime? ProductionDate { get; set; }
+    public uint? NumberOfDoors { get; set; }
+    public uint? NumberOfSeats { get; set; }
+    public double? LoadCapacity { get; set;}
+    public VehicleType? Type { get; set; }
+    public double? StartingPrice { get; set; }
 }
 
 public class UpdateVehicleValidator : AbstractValidator<UpdateVehicleRequest>
@@ -24,13 +24,7 @@ public class UpdateVehicleValidator : AbstractValidator<UpdateVehicleRequest>
         RuleFor(x => x.Id)
             .NotEmpty()
             .WithMessage("Vehicle ID must be provided.");
-
-        // Only validate the fields if they are provided
-        RuleFor(x => x.VIN)
-            .NotEmpty()
-            .When(x => !string.IsNullOrEmpty(x.VIN))
-            .WithMessage("VIN must be provided if specified.");
-
+        
         RuleFor(x => x.Make)
             .NotEmpty()
             .When(x => !string.IsNullOrEmpty(x.Make))

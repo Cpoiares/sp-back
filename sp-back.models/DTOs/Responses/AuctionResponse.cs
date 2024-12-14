@@ -1,22 +1,21 @@
 ﻿using sp_back.models.Enums;
-using sp_back.models.Models.Vehicles;
 
-namespace sp_back_api.DTOs.Responses;
+namespace sp_back.models.DTOs.Responses;
 
 public record AuctionResponse
 {
-    public string AuctionName { get; set; }
-    public Guid AuctionId { get; set; }
-    public List<AuctionVehicles> Vehicles { get; set; }
+    public int AuctionId { get; set; }
+    public List<AuctionVehicles> Vehicles { get; set; } = [];
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
     public AuctionStatus Status { get; set; }
+    public bool IsCollectiveAuction { get; set; }
 }
 
 public record AuctionVehicles
 {
-    public string Name { get; set; }
-    public string VIN { get; set; }
+    public string Name { get; set; } = "";
+    public string Vin { get; set; } = "";
     public double? WinningBid { get; set; }
     public string? BidderId { get; set; }
     public double VehicleStartingPrice { get; set; }

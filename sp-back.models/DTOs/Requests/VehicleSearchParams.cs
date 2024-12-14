@@ -1,6 +1,6 @@
 ﻿using sp_back.models.Enums;
 
-namespace sp_back.models.Models;
+namespace sp_back.models.DTOs.Requests;
 
 public class VehicleSearchParams
 {

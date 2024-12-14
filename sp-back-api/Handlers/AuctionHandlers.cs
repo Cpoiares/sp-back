@@ -1,11 +1,10 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using sp_back_api.DTOs;
-using sp_back_api.DTOs.Responses;
 using sp_back_api.Extensions;
 using sp_back_api.Services;
 using sp_back.models.DTOs.Requests;
+using sp_back.models.DTOs.Responses;
 
 namespace sp_back_api.Handlers;
 
@@ -31,7 +30,7 @@ public static class AuctionHandlers
         var auctions = await auctionService.GetActiveAuctionsAsync();
         var response = new GetAllActiveAuctionsResponse
         {
-            ActiveAuctions = auctions.Select(a => AuctionResponseHandler.BuildResponse(a)).ToList()
+            Auctions = auctions.Select(a => AuctionResponseHandler.BuildResponse(a)).ToList()
         };
         return Results.Ok(response);
     }
@@ -41,7 +40,7 @@ public static class AuctionHandlers
         var auctions = await auctionService.GetAllAuctionsAsync();
         var response = new GetAllActiveAuctionsResponse
         {
-            ActiveAuctions = auctions.Select(a => AuctionResponseHandler.BuildResponse(a)).ToList()
+            Auctions = auctions.Select(a => AuctionResponseHandler.BuildResponse(a)).ToList()
         };
         return Results.Ok(response);
     }
@@ -60,11 +59,11 @@ public static class AuctionHandlers
         var bid = auction.GetBidInformation(request.BidderId, request.VehicleVin);
         var response = new PlaceBidResponse
         {
-            BidId = bid.Id,
-            Bidder = bid.BidderId,
+            BidId = bid?.Id,
+            Bidder = bid?.BidderId ?? throw new InvalidDataException("Bidder ID is invalid"),
             Amount = bid.Amount,
             BidTime = bid.BidTime,
-            Vehicle = $"{bid.Vehicle.Make}{bid.Vehicle.Model}"
+            Vehicle = $"{bid.Vehicle?.Make}{bid.Vehicle?.Model}"
         };
         return Results.Ok(response);
     }
@@ -108,7 +107,7 @@ public static class AuctionHandlers
         {
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
-        var auction = await auctionService.CancelAuctionAsync(request.AuctionName);
+        var auction = await auctionService.CancelAuctionAsync(request.AuctionId);
         return Results.Ok(AuctionResponseHandler.BuildResponse(auction));
     }
 
@@ -122,7 +121,7 @@ public static class AuctionHandlers
         {
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
-        var auction = await auctionService.CloseAuctionAsync(request.AuctionName);
+        var auction = await auctionService.CloseAuctionAsync(request.AuctionId);
         return Results.Ok(AuctionResponseHandler.BuildCloseResponse(auction));
     }
 
@@ -136,7 +135,7 @@ public static class AuctionHandlers
         {
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
-        var auction = await auctionService.StartAuctionAsync(request.AuctionName);
+        var auction = await auctionService.StartAuctionAsync(request.AuctionId);
         return Results.Ok(AuctionResponseHandler.BuildStartResponse(auction));
     }
 
@@ -167,4 +166,13 @@ public static class AuctionHandlers
         var auction = await auctionService.PlaceBidInCollectiveAuction(request);
         return Results.Ok(AuctionResponseHandler.BuildStartResponse(auction));
     }
-}
+
+    public static async Task<IResult> GetCompletedAuctions(IAuctionService auctionService)
+    {
+        var auctions = await auctionService.GetCompletedAuctionsAsync();
+        var response = new GetAllActiveAuctionsResponse
+        {
+            Auctions = auctions.Select(a => AuctionResponseHandler.BuildResponse(a)).ToList()
+        };
+        return Results.Ok(response);
+    }}

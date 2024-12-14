@@ -1,4 +1,4 @@
-﻿namespace sp_back_api.DTOs.Responses;
+﻿namespace sp_back.models.DTOs.Responses;
 
 public class CreateVehicleResponse
 {

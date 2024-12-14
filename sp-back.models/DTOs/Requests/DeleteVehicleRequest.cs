@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
 
-namespace sp_back_api.DTOs;
+namespace sp_back.models.DTOs.Requests;
 
 public record DeleteVehicleRequest
 {
-    public Guid Id { get; set; }
+    public int Id { get; set; }
 }
 
 public class DeleteVehicleValidator : AbstractValidator<DeleteVehicleRequest>

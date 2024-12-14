@@ -1,18 +1,19 @@
 ﻿using FluentValidation;
 
-namespace sp_back_api.DTOs;
+namespace sp_back.models.DTOs.Requests;
 
 public class CloseAuctionRequest
 {
-    public string AuctionName { get; set; }
+    public int AuctionId { get; set; }
 }
 
 public class CloseAuctionValidator : AbstractValidator<CloseAuctionRequest>
 {
     public CloseAuctionValidator()
     {
-        RuleFor(x => x.AuctionName)
+        RuleFor(x => x.AuctionId)
             .NotEmpty()
-            .WithMessage("Auction name is required");
+            .GreaterThan(0)
+            .WithMessage("Auction id is required");
     }
 }

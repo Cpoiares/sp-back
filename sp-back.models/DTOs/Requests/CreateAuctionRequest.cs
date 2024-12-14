@@ -1,11 +1,10 @@
 ﻿using FluentValidation;
 
-namespace sp_back_api.DTOs;
+namespace sp_back.models.DTOs.Requests;
 
 public record CreateAuctionRequest
 {
-    public string Name { get; init; }
-    public DateTime? EndDate { get; init; }
+    public DateTime? EndDate { get; set; }
     public string[] VehicleVins { get; init; } = {};
 }
 
@@ -13,10 +12,6 @@ public class CreateAuctionValidator : AbstractValidator<CreateAuctionRequest>
 {
     public CreateAuctionValidator()
     {
-        RuleFor(x => x.Name)
-            .NotEmpty()
-            .WithMessage("Auction name is required");
-        
         RuleFor(x => x.VehicleVins)
             .NotNull()
             .WithMessage("Vehicle VINs are required")

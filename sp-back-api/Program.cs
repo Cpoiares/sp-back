@@ -8,15 +8,15 @@ using Microsoft.Extensions.DependencyInjection;
 using sp_back_api.Database;
 using sp_back_api.Database.Repository;
 using sp_back_api.Database.Repository.Implementation;
-using sp_back_api.DTOs.Responses;
 using sp_back_api.Extensions;
 using sp_back_api.Handlers;
-using sp_back_api.Loging;
+using sp_back_api.Logging;
 using sp_back_api.Middleware;
 using sp_back_api.Services;
 using sp_back_api.Services.Background.Implementation;
 using sp_back_api.Services.Implementation;
 using sp_back.models.Config;
+using sp_back.models.DTOs.Responses;
 using sp_back.models.Models.Vehicles;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
@@ -92,15 +92,32 @@ app.MapGet("/vehicles/{id}", VehicleHandlers.GetVehicleById)
 .ProducesProblem(StatusCodes.Status400BadRequest)
 .ProducesProblem(StatusCodes.Status404NotFound);
 
-app.MapPost("/vehicles", VehicleHandlers.CreateVehicle)
+app.MapPost("/vehicles/sedan", VehicleHandlers.CreateSedan)
 .WithName("CreateVehicle")
 .Produces<Vehicle>(StatusCodes.Status201Created)
 .ProducesProblem(StatusCodes.Status400BadRequest);
 
-app.MapPut("/vehicles/{id}", VehicleHandlers.UpdateVehicle)
-.WithName("UpdateVehicle").ProducesProblem(StatusCodes.Status400BadRequest);
+app.MapPost("/vehicles/hatchback", VehicleHandlers.CreateHatchback)
+    .WithName("CreateHatchback")
+    .Produces<Vehicle>(StatusCodes.Status201Created)
+    .ProducesProblem(StatusCodes.Status400BadRequest);
 
-app.MapDelete("/vehicles/{id}", VehicleHandlers.DeleteVehicle)
+app.MapPost("/vehicles/suv", VehicleHandlers.CreateSuv)
+    .WithName("CreateSuv")
+    .Produces<Vehicle>(StatusCodes.Status201Created)
+    .ProducesProblem(StatusCodes.Status400BadRequest);
+
+app.MapPost("/vehicles/truck", VehicleHandlers.CreateTruck)
+    .WithName("CreateTruck")
+    .Produces<Vehicle>(StatusCodes.Status201Created)
+    .ProducesProblem(StatusCodes.Status400BadRequest);
+
+app.MapPut("/vehicles/update", VehicleHandlers.UpdateVehicle)
+    .WithName("UpdateVehicle")
+    .ProducesProblem(StatusCodes.Status404NotFound)
+    .ProducesProblem(StatusCodes.Status400BadRequest);
+
+app.MapDelete("/vehicles", VehicleHandlers.DeleteVehicle)
 .WithName("DeleteVehicle")
 .ProducesProblem(StatusCodes.Status400BadRequest)
 .ProducesProblem(StatusCodes.Status404NotFound);
@@ -119,37 +136,41 @@ app.MapGet("/auctions/all", AuctionHandlers.GetAllAuctions)
     .WithName("GetAllAuctions")
     .Produces<GetAllActiveAuctionsResponse>();
 
+app.MapGet("/auctions/completed", AuctionHandlers.GetCompletedAuctions)
+    .WithName("GetCompletedAuctions")
+    .Produces<GetAllActiveAuctionsResponse>();
+
 app.MapPost("/auctions/bid", AuctionHandlers.PlaceBid)
 .WithName("PlaceBid")
 .Produces<PlaceBidResponse>()
 .ProducesProblem(StatusCodes.Status400BadRequest)
 .ProducesProblem(StatusCodes.Status404NotFound);
 
-app.MapPost("/auctions/{auctionId}/vehicles", AuctionHandlers.AddVehiclesToAuction)
+app.MapPost("/auctions/vehicles", AuctionHandlers.AddVehiclesToAuction)
 .WithName("AddVehiclesToAuction")
 .Produces<AuctionResponse>()
 .ProducesProblem(StatusCodes.Status400BadRequest)
 .ProducesProblem(StatusCodes.Status404NotFound);
 
-app.MapDelete("/auctions/{auctionId}/vehicles", AuctionHandlers.RemoveVehiclesFromAuction)    
+app.MapDelete("/auctions/vehicles", AuctionHandlers.RemoveVehiclesFromAuction)    
 .WithName("RemoveVehiclesFromAuction")
 .Produces<AuctionResponse>()
 .ProducesProblem(StatusCodes.Status400BadRequest)
 .ProducesProblem(StatusCodes.Status404NotFound);
 
-app.MapPost("/auctions/{auctionId}/cancel", AuctionHandlers.CancelAuction)
+app.MapPost("/auctions/cancel", AuctionHandlers.CancelAuction)
 .WithName("CancelAuction")
-.Produces<CancelAuctionResponse>()
+.Produces<AuctionResponse>()
 .ProducesProblem(StatusCodes.Status400BadRequest)
 .ProducesProblem(StatusCodes.Status404NotFound);
 
-app.MapPost("/auctions/{auctionId}/close", AuctionHandlers.CloseAuction)
+app.MapPost("/auctions/close", AuctionHandlers.CloseAuction)
     .WithName("CloseAuction")
     .Produces<CloseAuctionResponse>()
     .ProducesProblem(StatusCodes.Status400BadRequest)
     .ProducesProblem(StatusCodes.Status404NotFound);
 
-app.MapPost("/auctions/{auctionId}/start", AuctionHandlers.StartAuction)
+app.MapPost("/auctions/start", AuctionHandlers.StartAuction)
     .WithName("StartAuction")
     .Produces<StartAuctionResponse>()
     .ProducesProblem(StatusCodes.Status400BadRequest)

@@ -24,6 +24,9 @@ public class AuctionDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             
+            entity.Property(e => e.Id)
+                .ValueGeneratedOnAdd();
+            
             entity.HasMany(a => a.Vehicles)
                 .WithOne(v => v.Auction)
                 .HasForeignKey(v => v.AuctionId)
@@ -33,9 +36,7 @@ public class AuctionDbContext : DbContext
                 .WithOne(b => b.Auction)
                 .HasForeignKey(b => b.AuctionId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            entity.Property(e => e.Name)
-                .IsRequired();
+            
 
             entity.Property(e => e.StartTime);
 
@@ -45,6 +46,9 @@ public class AuctionDbContext : DbContext
         modelBuilder.Entity<Bid>(entity =>
         {
             entity.HasKey(e => e.Id);
+            
+            entity.Property(e => e.Id)
+                .ValueGeneratedOnAdd();
             
             entity.Property(e => e.Amount)
                 .HasColumnType("decimal(18,2)");
@@ -59,6 +63,9 @@ public class AuctionDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
 
+            entity.Property(e => e.Id)
+                .ValueGeneratedOnAdd();
+            
             entity.Property(e => e.Make)
                 .IsRequired();
 
@@ -76,8 +83,8 @@ public class AuctionDbContext : DbContext
         
         var vehicles = SeedData.GetVehicles().ToList();
         
-        vehicles[0].AuctionId = Guid.Parse("2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1"); // Mazda Bid
-        vehicles[4].AuctionId = Guid.Parse("2d73eb5c-c7b5-4a6a-9a3f-616b7d456ed1"); // Honda Bid
+        vehicles[0].AuctionId = 1; // Mazda Bid
+        vehicles[4].AuctionId = 1; // Honda Bid
         
         modelBuilder.Entity<Suv>().Property(s => s.NumberOfSeats);
         modelBuilder.Entity<Sedan>().Property(s => s.NumberOfDoors);

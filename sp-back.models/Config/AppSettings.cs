@@ -2,7 +2,7 @@
 
 public class AppSettings
 {
-    public DatabaseSettings Database { get; set; }
-    public LoggingSettings Logging { get; set; }
-    public AuctionSettings Auction { get; set; }
+    public DatabaseSettings Database { get; set; } = new();
+    public LoggingSettings Logging { get; set; } = new();
+    public AuctionSettings Auction { get; set; } = new();
 }
