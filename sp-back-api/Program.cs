@@ -24,6 +24,7 @@ using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 var builder = WebApplication.CreateBuilder(args);
 var projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../.."));
 
+// TODO: Need to validate is deleted and is sold every to prevent updates or deletes in deleted or sold vehicles
 builder.Configuration
     .SetBasePath(projectRoot)
     .AddJsonFile(Path.Combine("conf", "appsettings.json"), optional: false, reloadOnChange: true)
@@ -90,17 +91,17 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Vehicle endpoints
 app.MapGet("/vehicles", VehicleHandlers.GetVehicles)
-.WithName("GetVehicles");
-
+    .WithName("GetVehicles");
+    
 app.MapGet("/vehicles/{id}", VehicleHandlers.GetVehicleById)
-.WithName("GetVehicle")
-.ProducesProblem(StatusCodes.Status400BadRequest)
-.ProducesProblem(StatusCodes.Status404NotFound);
+    .WithName("GetVehicle")
+    .ProducesProblem(StatusCodes.Status400BadRequest)
+    .ProducesProblem(StatusCodes.Status404NotFound);
 
 app.MapPost("/vehicles/sedan", VehicleHandlers.CreateSedan)
-.WithName("CreateVehicle")
-.Produces<Vehicle>(StatusCodes.Status201Created)
-.ProducesProblem(StatusCodes.Status400BadRequest);
+    .WithName("CreateVehicle")
+    .Produces<Vehicle>(StatusCodes.Status201Created)
+    .ProducesProblem(StatusCodes.Status400BadRequest);
 
 app.MapPost("/vehicles/hatchback", VehicleHandlers.CreateHatchback)
     .WithName("CreateHatchback")
@@ -119,13 +120,13 @@ app.MapPost("/vehicles/truck", VehicleHandlers.CreateTruck)
 
 app.MapPut("/vehicles/update", VehicleHandlers.UpdateVehicle)
     .WithName("UpdateVehicle")
-    .ProducesProblem(StatusCodes.Status404NotFound)
-    .ProducesProblem(StatusCodes.Status400BadRequest);
+    .ProducesProblem(StatusCodes.Status400BadRequest)
+    .ProducesProblem(StatusCodes.Status404NotFound);
 
 app.MapDelete("/vehicles", VehicleHandlers.DeleteVehicle)
-.WithName("DeleteVehicle")
-.ProducesProblem(StatusCodes.Status400BadRequest)
-.ProducesProblem(StatusCodes.Status404NotFound);
+    .WithName("DeleteVehicle")
+    .ProducesProblem(StatusCodes.Status400BadRequest)
+    .ProducesProblem(StatusCodes.Status404NotFound);
 
 // Auction endpoints
 app.MapPost("/auctions", AuctionHandlers.CreateAuction)
@@ -146,28 +147,28 @@ app.MapGet("/auctions/completed", AuctionHandlers.GetCompletedAuctions)
     .Produces<GetAllActiveAuctionsResponse>();
 
 app.MapPost("/auctions/bid", AuctionHandlers.PlaceBid)
-.WithName("PlaceBid")
-.Produces<PlaceBidResponse>()
-.ProducesProblem(StatusCodes.Status400BadRequest)
-.ProducesProblem(StatusCodes.Status404NotFound);
+    .WithName("PlaceBid")
+    .Produces<PlaceBidResponse>()
+    .ProducesProblem(StatusCodes.Status400BadRequest)
+    .ProducesProblem(StatusCodes.Status404NotFound);
 
 app.MapPost("/auctions/vehicles", AuctionHandlers.AddVehiclesToAuction)
-.WithName("AddVehiclesToAuction")
-.Produces<AuctionResponse>()
-.ProducesProblem(StatusCodes.Status400BadRequest)
-.ProducesProblem(StatusCodes.Status404NotFound);
+    .WithName("AddVehiclesToAuction")
+    .Produces<AuctionResponse>()
+    .ProducesProblem(StatusCodes.Status400BadRequest)
+    .ProducesProblem(StatusCodes.Status404NotFound);
 
 app.MapDelete("/auctions/vehicles", AuctionHandlers.RemoveVehiclesFromAuction)    
-.WithName("RemoveVehiclesFromAuction")
-.Produces<AuctionResponse>()
-.ProducesProblem(StatusCodes.Status400BadRequest)
-.ProducesProblem(StatusCodes.Status404NotFound);
+    .WithName("RemoveVehiclesFromAuction")
+    .Produces<AuctionResponse>()
+    .ProducesProblem(StatusCodes.Status400BadRequest)
+    .ProducesProblem(StatusCodes.Status404NotFound);
 
 app.MapPost("/auctions/cancel", AuctionHandlers.CancelAuction)
-.WithName("CancelAuction")
-.Produces<AuctionResponse>()
-.ProducesProblem(StatusCodes.Status400BadRequest)
-.ProducesProblem(StatusCodes.Status404NotFound);
+    .WithName("CancelAuction")
+    .Produces<AuctionResponse>()
+    .ProducesProblem(StatusCodes.Status400BadRequest)
+    .ProducesProblem(StatusCodes.Status404NotFound);
 
 app.MapPost("/auctions/close", AuctionHandlers.CloseAuction)
     .WithName("CloseAuction")

@@ -5,6 +5,7 @@ namespace sp_back.models.DTOs.Requests;
 
 public record UpdateVehicleRequest
 {
+    public UpdateVehicleRequest() { }
     public UpdateVehicleRequest(string? manufacturer, string? model, DateTime? productionDate, uint? numberOfDoors, uint? numberOfSeats, double? loadCapacity, VehicleType? type, double? startingPrice, int id)
     {
         Manufacturer = manufacturer;
@@ -37,33 +38,14 @@ public class UpdateVehicleValidator : AbstractValidator<UpdateVehicleRequest>
             .NotEmpty()
             .WithMessage("Vehicle ID must be provided.");
         
-        RuleFor(x => x.Manufacturer)
-            .NotEmpty()
-            .When(x => !string.IsNullOrEmpty(x.Manufacturer))
-            .WithMessage("Manufacturer cannot be empty.");
-
-        RuleFor(x => x.Model)
-            .NotEmpty()
-            .When(x => !string.IsNullOrEmpty(x.Model))
-            .WithMessage("Model cannot be empty.");
-
-        RuleFor(x => x.ProductionDate)
-            .LessThanOrEqualTo(DateTime.UtcNow)
-            .When(x => x.ProductionDate.HasValue)
-            .WithMessage("Production date must be a valid date and not in the future.");
-
-        RuleFor(x => x.StartingPrice)
-            .GreaterThan(0)
-            .When(x => x.StartingPrice.HasValue)
-            .WithMessage("Starting price must be greater than zero.");
-
-        RuleFor(x => x.Type)
-            .IsInEnum()
-            .When(x => x.Type.HasValue)
-            .WithMessage("Vehicle type must be a valid enum value.");
-
-        // Type-specific validation
-        When(x => x.Type == VehicleType.Suv, () =>
+        When(x => x.StartingPrice.HasValue, () =>
+        {
+            RuleFor(x => x.StartingPrice)
+                .GreaterThan(0)
+                .WithMessage("Starting price must be greater than 0");
+        });
+        
+        When(x => x.Type.HasValue && x.Type == VehicleType.Suv, () =>
         {
             RuleFor(x => x.NumberOfSeats)
                 .NotNull()
@@ -81,7 +63,7 @@ public class UpdateVehicleValidator : AbstractValidator<UpdateVehicleRequest>
                 .WithMessage("Number of doors is not applicable for SUVs.");
         });
 
-        When(x => x.Type == VehicleType.Sedan, () =>
+        When(x => x.Type.HasValue && x.Type == VehicleType.Sedan, () =>
         {
             RuleFor(x => x.NumberOfDoors)
                 .NotNull()
@@ -99,7 +81,7 @@ public class UpdateVehicleValidator : AbstractValidator<UpdateVehicleRequest>
                 .WithMessage("Number of seats is not applicable for sedans.");
         });
 
-        When(x => x.Type == VehicleType.Truck, () =>
+        When(x => x.Type.HasValue && x.Type == VehicleType.Truck, () =>
         {
             RuleFor(x => x.LoadCapacity)
                 .NotNull()
