@@ -21,6 +21,7 @@ public class Truck : Vehicle
             Vin = Vin,
             Manufacturer = Manufacturer,
             Model = Model,
+            ProductionDate = ProductionDate,
             LoadCapacity = LoadCapacity,
             Available = IsAvailable,
             VehicleType = VehicleType.Truck,

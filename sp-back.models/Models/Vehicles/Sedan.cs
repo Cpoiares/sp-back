@@ -22,6 +22,7 @@ public class Sedan : Vehicle
             Model = Model,
             NumberOfDoors = NumberOfDoors,
             Available = IsAvailable,
+            ProductionDate = ProductionDate,
             VehicleType = VehicleType.Sedan,
             Sold = IsSold,
             StartingPrice = StartingPrice,

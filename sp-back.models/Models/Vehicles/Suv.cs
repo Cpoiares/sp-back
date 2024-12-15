@@ -22,6 +22,7 @@ public class Suv : Vehicle
             Model = Model,
             NumberOfSeats = NumberOfSeats,
             Available = IsAvailable,
+            ProductionDate = ProductionDate,
             VehicleType = VehicleType.Suv,
             Sold = IsSold,
             StartingPrice = StartingPrice,

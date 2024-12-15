@@ -22,6 +22,8 @@ public class Hatchback : Vehicle
             Model = Model,
             NumberOfDoors = NumberOfDoors,
             Available = IsAvailable,
+            ProductionDate = ProductionDate,
+            VehicleType = VehicleType.Sedan,
             Sold = IsSold,
             StartingPrice = StartingPrice,
             AuctionId = Auction?.Id,
