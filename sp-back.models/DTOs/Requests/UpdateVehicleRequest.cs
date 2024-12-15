@@ -5,16 +5,28 @@ namespace sp_back.models.DTOs.Requests;
 
 public record UpdateVehicleRequest
 {
+    public UpdateVehicleRequest(string? manufacturer, string? model, DateTime? productionDate, uint? numberOfDoors, uint? numberOfSeats, double? loadCapacity, VehicleType? type, double? startingPrice, int id)
+    {
+        Manufacturer = manufacturer;
+        Model = model;
+        ProductionDate = productionDate;
+        NumberOfDoors = numberOfDoors;
+        NumberOfSeats = numberOfSeats;
+        LoadCapacity = loadCapacity;
+        Type = type;
+        StartingPrice = startingPrice;
+        Id = id;
+    }
 
     public int Id { get; set; }
-    public string? Make { get; set; }
-    public string? Model { get; set; }
-    public DateTime? ProductionDate { get; set; }
-    public uint? NumberOfDoors { get; set; }
-    public uint? NumberOfSeats { get; set; }
+    public string? Manufacturer { get; set;}
+    public string? Model { get; set;}
+    public DateTime? ProductionDate { get; set;}
+    public uint? NumberOfDoors { get; set;}
+    public uint? NumberOfSeats { get; set;}
     public double? LoadCapacity { get; set;}
-    public VehicleType? Type { get; set; }
-    public double? StartingPrice { get; set; }
+    public VehicleType? Type { get; set;}
+    public double? StartingPrice { get; set;}
 }
 
 public class UpdateVehicleValidator : AbstractValidator<UpdateVehicleRequest>
@@ -25,10 +37,10 @@ public class UpdateVehicleValidator : AbstractValidator<UpdateVehicleRequest>
             .NotEmpty()
             .WithMessage("Vehicle ID must be provided.");
         
-        RuleFor(x => x.Make)
+        RuleFor(x => x.Manufacturer)
             .NotEmpty()
-            .When(x => !string.IsNullOrEmpty(x.Make))
-            .WithMessage("Make cannot be empty.");
+            .When(x => !string.IsNullOrEmpty(x.Manufacturer))
+            .WithMessage("Manufacturer cannot be empty.");
 
         RuleFor(x => x.Model)
             .NotEmpty()

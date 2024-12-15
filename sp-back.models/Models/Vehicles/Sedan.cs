@@ -5,7 +5,7 @@ namespace sp_back.models.Models.Vehicles;
 
 public class Sedan : Vehicle
 {
-    public Sedan(string make, string model, DateTime productionDate, double startingPrice, string vin, uint numberOfDoors) : base(make, model, productionDate, startingPrice, vin)
+    public Sedan(string manufacturer, string model, DateTime productionDate, double startingPrice, string vin, uint numberOfDoors) : base(manufacturer, model, productionDate, startingPrice, vin)
     {
         NumberOfDoors = numberOfDoors;
         Type = VehicleType.Sedan;
@@ -18,7 +18,7 @@ public class Sedan : Vehicle
         {
             Id = Id,
             Vin = Vin,
-            Make = Make,
+            Manufacturer = Manufacturer,
             Model = Model,
             NumberOfDoors = NumberOfDoors,
             Available = IsAvailable,

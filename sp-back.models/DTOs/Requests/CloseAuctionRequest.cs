@@ -2,8 +2,13 @@
 
 namespace sp_back.models.DTOs.Requests;
 
-public class CloseAuctionRequest
+public record CloseAuctionRequest
 {
+    public CloseAuctionRequest(int auctionId)
+    {
+        AuctionId = auctionId;
+    }
+
     public int AuctionId { get; set; }
 }
 

@@ -4,8 +4,14 @@ namespace sp_back.models.DTOs.Requests;
 
 public record CreateAuctionRequest
 {
+    public CreateAuctionRequest(DateTime? endDate, string[] vehicleVins)
+    {
+        EndDate = endDate;
+        VehicleVins = vehicleVins;
+    }
+
     public DateTime? EndDate { get; set; }
-    public string[] VehicleVins { get; init; } = {};
+    public string[] VehicleVins { get; set;}
 }
 
 public class CreateAuctionValidator : AbstractValidator<CreateAuctionRequest>

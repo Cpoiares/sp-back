@@ -30,7 +30,7 @@ public class AuctionLogger : IAuctionLogger
                 VehicleInfo = new
                 {
                     vehicle.Id,
-                    vehicle.Make,
+                    vehicle.Manufacturer,
                     vehicle.Model,
                     vehicle.Year,
                     vehicle.Type,

@@ -5,7 +5,7 @@ namespace sp_back.models.Models.Vehicles;
 
 public class Hatchback : Vehicle
 {
-    public Hatchback(string make, string model, DateTime productionDate, double startingPrice, string vin, uint numberOfDoors) : base(make, model, productionDate, startingPrice, vin)
+    public Hatchback(string manufacturer, string model, DateTime productionDate, double startingPrice, string vin, uint numberOfDoors) : base(manufacturer, model, productionDate, startingPrice, vin)
     {
         NumberOfDoors = numberOfDoors;
         Type = VehicleType.Hatchback;
@@ -18,7 +18,7 @@ public class Hatchback : Vehicle
         {
             Id = Id,
             Vin = Vin,
-            Make = Make,
+            Manufacturer = Manufacturer,
             Model = Model,
             NumberOfDoors = NumberOfDoors,
             Available = IsAvailable,

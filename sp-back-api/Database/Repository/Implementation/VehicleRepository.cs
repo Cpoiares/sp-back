@@ -65,7 +65,7 @@ public class VehicleRepository : IVehicleRepository
             var query = _context.Vehicles.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchParams.Manufacturer))
-                query = query.Where(v => v.Make.Contains(searchParams.Manufacturer));
+                query = query.Where(v => v.Manufacturer.Contains(searchParams.Manufacturer));
             
             if (!string.IsNullOrWhiteSpace(searchParams.Model))
                 query = query.Where(v => v.Model.Contains(searchParams.Model));
@@ -79,8 +79,15 @@ public class VehicleRepository : IVehicleRepository
             if (searchParams.YearTo.HasValue)
                 query = query.Where(v => v.ProductionDate.Year <= searchParams.YearTo.Value);
             
-            query = query.Where(v => v.IsAvailable);
-
+            if (searchParams.HideNonAvailable.HasValue && searchParams.HideNonAvailable.Value)
+                query = query.Where(v => v.IsAvailable);
+            
+            if (searchParams.HideSold.HasValue && searchParams.HideSold.Value)
+                query = query.Where(v => string.IsNullOrEmpty(v.BuyerId));
+            
+            if (!searchParams.ShowDeleted.HasValue || searchParams.ShowDeleted.Value == false)
+                query = query.Where(v => !v.IsDeleted);
+            
             return await query.ToListAsync();
         }
         catch (Exception ex)
@@ -134,7 +141,8 @@ public class VehicleRepository : IVehicleRepository
             var vehicle = await _context.Vehicles.FindAsync(id);
             if (vehicle != null)
             {
-                _context.Vehicles.Remove(vehicle);
+                vehicle.IsDeleted = true;
+                _context.Vehicles.Update(vehicle);
                 await _context.SaveChangesAsync();
             }
         }

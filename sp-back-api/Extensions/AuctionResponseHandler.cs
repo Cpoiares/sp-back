@@ -13,7 +13,7 @@ public static class AuctionResponseHandler
             Vehicles = auction.Vehicles.Select(v =>  new AuctionVehicles()
             {
                 Vin = v.Vin,
-                Name = $"{v.Make} {v.Model}",
+                Name = $"{v.Manufacturer} {v.Model}",
                 VehicleStartingPrice = v.StartingPrice,
                 WinningBid = string.IsNullOrEmpty(auction.GetHighestBidderForVehicle(v.Id)) ? null : auction.GetHighestBidForVehicle(v.Id).Amount,
                 BidderId = auction.GetHighestBidderForVehicle(v.Id)
@@ -32,7 +32,7 @@ public static class AuctionResponseHandler
             Vehicles = auction.Vehicles.Select(v =>  new AuctionVehicles()
             {
                 Vin = v.Vin,
-                Name = $"{v.Make}{v.Model}",
+                Name = $"{v.Manufacturer}{v.Model}",
                 VehicleStartingPrice = v.StartingPrice,
                 WinningBid =  string.IsNullOrEmpty(auction.GetHighestBidderForVehicle(v.Id)) ? null : auction.GetHighestBidForVehicle(v.Id).Amount,
                 BidderId = auction.GetHighestBidderForVehicle(v.Id)
@@ -49,7 +49,7 @@ public static class AuctionResponseHandler
             Vehicles = auction.Vehicles.Select(v =>  new AuctionVehicles()
             {
                 Vin = v.Vin,
-                Name = $"{v.Make}{v.Model}",
+                Name = $"{v.Manufacturer}{v.Model}",
                 VehicleStartingPrice = v.StartingPrice,
                 WinningBid = string.IsNullOrEmpty(auction.GetHighestBidderForVehicle(v.Id)) ? null : auction.GetHighestBidForVehicle(v.Id).Amount,
                 BidderId = auction.GetHighestBidderForVehicle(v.Id)

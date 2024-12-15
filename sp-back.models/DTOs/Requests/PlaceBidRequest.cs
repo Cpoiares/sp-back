@@ -4,9 +4,15 @@ namespace sp_back.models.DTOs.Requests;
 
 public record PlaceBidRequest
 {
-    public required string BidderId { get; init; }
-    public required string VehicleVin { get; init; }
-    public required double Amount { get; init; }
+    public PlaceBidRequest(string bidderId, string vehicleVin, double amount)
+    {
+        BidderId = bidderId;
+        VehicleVin = vehicleVin;
+        Amount = amount;
+    }
+    public string BidderId { get;}
+    public string VehicleVin { get; }
+    public double Amount { get; set; }
 }
 
 public class PlaceBidValidator : AbstractValidator<PlaceBidRequest>

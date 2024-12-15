@@ -51,7 +51,7 @@ public class AuctionDbContext : DbContext
                 .ValueGeneratedOnAdd();
             
             entity.Property(e => e.Amount)
-                .HasColumnType("decimal(18,2)");
+                .HasColumnType("double");
             
             entity.HasOne(b => b.Auction)
                 .WithMany(a => a.Bids)
@@ -66,7 +66,7 @@ public class AuctionDbContext : DbContext
             entity.Property(e => e.Id)
                 .ValueGeneratedOnAdd();
             
-            entity.Property(e => e.Make)
+            entity.Property(e => e.Manufacturer)
                 .IsRequired();
 
             entity.Property(e => e.Model)
@@ -79,6 +79,12 @@ public class AuctionDbContext : DbContext
             entity.Property(e => e.StartingPrice)
                 .IsRequired()
                 .HasColumnType("double");
+            
+            entity.Property(e => e.IsDeleted)
+                .IsRequired();
+            
+            entity.Property(e => e.IsAvailable)
+                .IsRequired();
         });
         
         var vehicles = SeedData.GetVehicles().ToList();

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using sp_back.models.DTOs.Responses;
+﻿using sp_back.models.DTOs.Responses;
 using sp_back.models.Enums;
 
 
@@ -7,20 +6,20 @@ namespace sp_back.models.Models.Vehicles;
 
 public abstract class Vehicle
 {
-    protected Vehicle(string make, string model, DateTime productionDate, double startingPrice, string vin)
+    protected Vehicle(string manufacturer, string model, DateTime productionDate, double startingPrice, string vin)
     {
-        Make = make;
+        Manufacturer = manufacturer;
         Model = model;
         ProductionDate = productionDate;
         StartingPrice = startingPrice;
         Vin = vin;
+        IsDeleted = false;
     }
 
 
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
     public virtual Auction.Auction? Auction { get; init; }
-    public string Make { get; set; }
+    public string Manufacturer { get; set; }
     public string Model { get; set; }
     public DateTime ProductionDate { get; set; }
     public string Year => ProductionDate.Year.ToString();
@@ -31,6 +30,7 @@ public abstract class Vehicle
     public string? BuyerId { get; set; }
     public int? AuctionId { get; set; }
     public string Vin { get; set; }
+    public bool IsDeleted { get; set; }
 
     public abstract VehicleResponse GetVehicleResponses();
 

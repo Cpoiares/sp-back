@@ -19,7 +19,6 @@ public class Bid : IComparable<Bid>
         BidderId = bidderId;
         BidTime = DateTime.UtcNow;
     }
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
     public string BidderId { get; init; }
     public double Amount { get; set; }

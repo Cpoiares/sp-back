@@ -2,10 +2,16 @@
 
 namespace sp_back.models.DTOs.Requests;
 
-public class AddVehiclesToAuctionRequest
+public record AddVehiclesToAuctionRequest
 {
-    public int AuctionId { get; init; }
-    public string[] VehicleVins { get; init; } = [];
+    public AddVehiclesToAuctionRequest(int auctionId, string[] vehicleVins)
+    {
+        AuctionId = auctionId;
+        VehicleVins = vehicleVins;
+    }
+
+    public int AuctionId { get; set; }
+    public string[] VehicleVins { get; set; }
 }
 
 public class AddVehiclesToAuctionValidator : AbstractValidator<AddVehiclesToAuctionRequest>

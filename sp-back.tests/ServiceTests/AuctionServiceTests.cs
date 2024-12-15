@@ -17,6 +17,7 @@ using sp_back.models.Models.Auction;
 using sp_back.models.Models.Vehicles;
 using sp_back.tests.Helpers;
 using Xunit;
+using InvalidOperationException = sp_back.models.Exceptions.InvalidOperationException;
 
 namespace sp_back.tests.ServiceTests;
 
@@ -71,10 +72,7 @@ public class AuctionServiceTests : IDisposable
     public async Task CreateAuction_WithValidData_ShouldCreateAndReturnAuction()
     {
         // Arrange
-        var request = new CreateAuctionRequest
-        {
-            VehicleVins = _testVehicles.Select(v => v.Vin).ToArray()
-        };
+        var request = new CreateAuctionRequest(null, _testVehicles.Select(v => v.Vin).ToArray());
 
         // Act
         var result = await _auctionService.CreateAuctionAsync(request);
@@ -89,10 +87,7 @@ public class AuctionServiceTests : IDisposable
     public async Task CreateAuction_WithNonExistentVehicle_ShouldThrowNotFoundException()
     {
         // Arrange
-        var request = new CreateAuctionRequest
-        {
-            VehicleVins = new[] { "testVin1" }
-        };
+        var request = new CreateAuctionRequest(null, new[] { "testVin1" });
 
         // Act
         var act = () => _auctionService.CreateAuctionAsync(request);
@@ -109,17 +104,14 @@ public class AuctionServiceTests : IDisposable
         if (vehicle != null) vehicle.IsAvailable = false;
         await _context.SaveChangesAsync();
 
-        var request = new CreateAuctionRequest
-        {
-            VehicleVins = _testVehicles.Select(v => v.Vin).ToArray()
-        };
+        var request = new CreateAuctionRequest(null, _testVehicles.Select(v => v.Vin).ToArray());
 
         // Act
         var act = () => _auctionService.CreateAuctionAsync(request);
 
         // Assert
         await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("Vehicle is not available for auction");
+            .WithMessage("*not available for auction");
     }
 
     [Fact]
@@ -128,12 +120,7 @@ public class AuctionServiceTests : IDisposable
         // Arrange
         await CreateActiveAuction();
         var vehicle = _testVehicles[0];
-        var request = new PlaceBidRequest
-        {
-            BidderId = "testUser",
-            Amount = 10500,
-            VehicleVin = vehicle.Vin,
-        };
+        var request = new PlaceBidRequest("testUser", vehicle.Vin, 10500);
 
         // Act
         var result = await _auctionService.PlaceBidAsync(request);
@@ -151,12 +138,7 @@ public class AuctionServiceTests : IDisposable
     public async Task PlaceBid_OnNonExistentAuction_ShouldThrowNotFoundException()
     {
         // Arrange
-        var request = new PlaceBidRequest
-        {
-            BidderId = "testUser",
-            Amount = 10500,
-            VehicleVin = _testVehicles[0].Vin,
-        };
+        var request = new PlaceBidRequest("testUser", _testVehicles[0].Vin, 10500);
 
         // Act
         var act = () => _auctionService.PlaceBidAsync(request);
@@ -170,12 +152,7 @@ public class AuctionServiceTests : IDisposable
     {
         // Arrange
         await CreateCompletedAuction();
-        var request = new PlaceBidRequest
-        {
-            BidderId = "testUser",
-            Amount = 10500,
-            VehicleVin = _testVehicles[0].Vin
-        };
+        var request = new PlaceBidRequest("testUser", _testVehicles[0].Vin, 10500);
 
         // Act
         var act = () => _auctionService.PlaceBidAsync(request);
@@ -278,12 +255,7 @@ public class AuctionServiceTests : IDisposable
     {
         // Arrange
         var startingBid = 5000.0;
-        var request = new CreateCollectiveAuctionRequest
-        {
-            EndDate = DateTime.UtcNow.AddDays(1),
-            StartingBid = startingBid,
-            VehicleVins = _testVehicles.Select(v => v.Vin).ToArray()
-        };
+        var request = new CreateCollectiveAuctionRequest(null, _testVehicles.Select(v => v.Vin).ToArray(), startingBid);
 
         // Act
         var result = await _auctionService.CreateCollectiveAuction(request);
@@ -302,12 +274,7 @@ public class AuctionServiceTests : IDisposable
         // Arrange
         var auction = await CreateTestCollectiveAuction();
         var bidAmount = 15000.0;
-        var request = new PlaceBidInCollectiveAuctionRequest
-        {
-            AuctionId = auction.Id,
-            BidderId = "testBidder",
-            Amount = bidAmount
-        };
+        var request = new PlaceBidInCollectiveAuctionRequest("testBidder", auction.Id, bidAmount);
 
         // Act
         var result = await _auctionService.PlaceBidInCollectiveAuction(request);
@@ -330,19 +297,9 @@ public class AuctionServiceTests : IDisposable
         // Arrange
         var auction = await CreateTestCollectiveAuction();
         // Place an initial bid
-        await _auctionService.PlaceBidInCollectiveAuction(new PlaceBidInCollectiveAuctionRequest
-        {
-            AuctionId = auction.Id,
-            BidderId = "firstBidder",
-            Amount = 15000.0
-        });
+        await _auctionService.PlaceBidInCollectiveAuction(new PlaceBidInCollectiveAuctionRequest("firstBidder", auction.Id, 15000.0));
 
-        var lowerBidRequest = new PlaceBidInCollectiveAuctionRequest
-        {
-            AuctionId = auction.Id,
-            BidderId = "secondBidder",
-            Amount = 14000.0  // Lower than existing bid
-        };
+        var lowerBidRequest = new PlaceBidInCollectiveAuctionRequest("secondBidder", auction.Id, 14000.0);
 
         // Act
         var act = () => _auctionService.PlaceBidInCollectiveAuction(lowerBidRequest);
@@ -398,12 +355,7 @@ public class AuctionServiceTests : IDisposable
     
     private async Task<Auction> CreateTestCollectiveAuction()
     {
-        var request = new CreateCollectiveAuctionRequest
-        {
-            EndDate = DateTime.UtcNow.AddDays(1),
-            StartingBid = 10000.0,
-            VehicleVins = _testVehicles.Select(v => v.Vin).ToArray()
-        };
+        var request = new CreateCollectiveAuctionRequest(DateTime.UtcNow.AddDays(1), _testVehicles.Select(v => v.Vin).ToArray(), 10000.0);
 
         var auction = await _auctionService.CreateCollectiveAuction(request);
         auction.Status = AuctionStatus.Active;

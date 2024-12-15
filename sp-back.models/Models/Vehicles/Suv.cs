@@ -5,7 +5,7 @@ namespace sp_back.models.Models.Vehicles;
 
 public class Suv : Vehicle 
 {
-    public Suv(string make, string model, DateTime productionDate, double startingPrice, string vin, uint numberOfSeats) : base(make, model, productionDate, startingPrice, vin)
+    public Suv(string manufacturer, string model, DateTime productionDate, double startingPrice, string vin, uint numberOfSeats) : base(manufacturer, model, productionDate, startingPrice, vin)
     {
         NumberOfSeats = numberOfSeats;
         Type = VehicleType.Suv;
@@ -18,7 +18,7 @@ public class Suv : Vehicle
         {
             Id = Id,
             Vin = Vin,
-            Make = Make,
+            Manufacturer = Manufacturer,
             Model = Model,
             NumberOfSeats = NumberOfSeats,
             Available = IsAvailable,

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using sp_back.models.Exceptions;
 using sp_back.models.Models.Error;
+using InvalidOperationException = System.InvalidOperationException;
 
 namespace sp_back_api.Middleware;
 
@@ -49,6 +50,11 @@ public class ExceptionHandlingMiddleware
             case ValidationException validationException:
                 response.StatusCode = StatusCodes.Status400BadRequest;
                 errorResponse.Message = validationException.Message;
+                break;
+            
+            case InvalidOperationException notFoundException:
+                response.StatusCode = StatusCodes.Status500InternalServerError;
+                errorResponse.Message = notFoundException.Message;
                 break;
             default:
                 response.StatusCode = StatusCodes.Status500InternalServerError;

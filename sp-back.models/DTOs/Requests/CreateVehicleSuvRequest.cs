@@ -4,12 +4,12 @@ namespace sp_back.models.DTOs.Requests;
 public record CreateVehicleSuvRequest : CreateVehicleRequest
 {
     
-    public CreateVehicleSuvRequest(string make, string model, DateTime productionDate, double startingPrice, string vin, uint numberOfSeats) : base(make, model, productionDate, startingPrice, vin)
+    public CreateVehicleSuvRequest(string manufacturer, string model, DateTime productionDate, double startingPrice, string vin, uint numberOfSeats) : base(manufacturer, model, productionDate, startingPrice, vin)
     {
         NumberOfSeats = numberOfSeats;
     }
 
-    public uint NumberOfSeats { get; set; }
+    public uint NumberOfSeats { get; set;}
 }
 
 public class CreateVehicleSuvRequestValidator : AbstractValidator<CreateVehicleSuvRequest>
@@ -19,7 +19,7 @@ public class CreateVehicleSuvRequestValidator : AbstractValidator<CreateVehicleS
         RuleFor(x => x.Vin)
             .NotEmpty();
         
-        RuleFor(x => x.Make)
+        RuleFor(x => x.Manufacturer)
             .NotEmpty();
 
         RuleFor(x => x.Model)

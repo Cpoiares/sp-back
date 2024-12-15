@@ -4,8 +4,13 @@ namespace sp_back.models.DTOs.Requests;
 
 public class RemoveVehiclesFromAuctionRequest
 {
-    public string[] VehicleVins { get; init; } = [];
-    public int AuctionId { get; init; }
+    public RemoveVehiclesFromAuctionRequest(int auctionId, string[] vehicleVins)
+    {
+        AuctionId = auctionId;
+        VehicleVins = vehicleVins;
+    }
+    public string[] VehicleVins { get; set;}
+    public int AuctionId { get; set;}
 
 }
 

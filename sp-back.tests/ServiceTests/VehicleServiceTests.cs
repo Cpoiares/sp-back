@@ -40,7 +40,7 @@ public class VehicleServiceTests : IDisposable
         result.Should().BeOfType<Sedan>();
         var sedan = (Sedan)result;
         sedan.NumberOfDoors.Should().Be(request.NumberOfDoors);
-        result.Make.Should().Be(request.Make);
+        result.Manufacturer.Should().Be(request.Manufacturer);
         result.Model.Should().Be(request.Model);
         result.ProductionDate.Should().Be(request.ProductionDate);
         result.Year.Should().Be(request.ProductionDate.Year.ToString());
@@ -63,7 +63,7 @@ public class VehicleServiceTests : IDisposable
         result.Should().BeOfType<Suv>();
         var suv = (Suv)result;
         suv.NumberOfSeats.Should().Be(request.NumberOfSeats);
-        result.Make.Should().Be(request.Make);
+        result.Manufacturer.Should().Be(request.Manufacturer);
         result.Model.Should().Be(request.Model);
         result.ProductionDate.Should().Be(request.ProductionDate);
         result.Year.Should().Be(request.ProductionDate.Year.ToString());
@@ -86,7 +86,7 @@ public class VehicleServiceTests : IDisposable
         result.Should().BeOfType<Truck>();
         var truck = (Truck)result;
         truck.LoadCapacity.Should().Be(request.LoadCapacity);
-        result.Make.Should().Be(request.Make);
+        result.Manufacturer.Should().Be(request.Manufacturer);
         result.Model.Should().Be(request.Model);
         result.ProductionDate.Should().Be(request.ProductionDate);
         result.Year.Should().Be(request.ProductionDate.Year.ToString());
@@ -109,7 +109,7 @@ public class VehicleServiceTests : IDisposable
         result.Should().BeOfType<Hatchback>();
         var hatchback = (Hatchback)result;
         hatchback.NumberOfDoors.Should().Be(request.NumberOfDoors);
-        result.Make.Should().Be(request.Make);
+        result.Manufacturer.Should().Be(request.Manufacturer);
         result.Model.Should().Be(request.Model);
         result.ProductionDate.Should().Be(request.ProductionDate);
         result.Year.Should().Be(request.ProductionDate.Year.ToString());
@@ -154,15 +154,12 @@ public class VehicleServiceTests : IDisposable
             "Honda", "Civic", DateTime.Today, 23000, "TEST2", 4));
 
         // Act
-        var result = await _vehicleService.SearchVehiclesAsync(new VehicleSearchParams 
-        { 
-            Manufacturer = "Toyota" 
-        });
+        var result = await _vehicleService.SearchVehiclesAsync(new VehicleSearchParams(null, "Toyota", null, null, null, false, false, true));
 
         // Assert
         var enumerable = result as Vehicle[] ?? result.ToArray();
         enumerable.Should().HaveCount(1);
-        enumerable.First().Make.Should().Be("Toyota");
+        enumerable.First().Manufacturer.Should().Be("Toyota");
     }
 
     public void Dispose()

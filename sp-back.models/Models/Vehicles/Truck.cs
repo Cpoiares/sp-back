@@ -5,7 +5,7 @@ namespace sp_back.models.Models.Vehicles;
 
 public class Truck : Vehicle
 {
-    public Truck(string make, string model, DateTime productionDate, double startingPrice, string vin, double loadCapacity) : base(make, model, productionDate, startingPrice, vin)
+    public Truck(string manufacturer, string model, DateTime productionDate, double startingPrice, string vin, double loadCapacity) : base(manufacturer, model, productionDate, startingPrice, vin)
     {
         LoadCapacity = loadCapacity;
         Type = VehicleType.Truck;
@@ -19,7 +19,7 @@ public class Truck : Vehicle
         {
             Id = Id,
             Vin = Vin,
-            Make = Make,
+            Manufacturer = Manufacturer,
             Model = Model,
             LoadCapacity = LoadCapacity,
             Available = IsAvailable,

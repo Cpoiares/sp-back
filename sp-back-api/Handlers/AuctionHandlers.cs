@@ -63,7 +63,7 @@ public static class AuctionHandlers
             Bidder = bid?.BidderId ?? throw new InvalidDataException("Bidder ID is invalid"),
             Amount = bid.Amount,
             BidTime = bid.BidTime,
-            Vehicle = $"{bid.Vehicle?.Make}{bid.Vehicle?.Model}"
+            Vehicle = $"{bid.Vehicle?.Manufacturer}{bid.Vehicle?.Model}"
         };
         return Results.Ok(response);
     }

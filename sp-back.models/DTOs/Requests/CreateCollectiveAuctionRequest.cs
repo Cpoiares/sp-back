@@ -2,11 +2,17 @@
 
 namespace sp_back.models.DTOs.Requests;
 
-public class CreateCollectiveAuctionRequest
+public record CreateCollectiveAuctionRequest
 {
-    public DateTime? EndDate { get; init; }
-    public string[] VehicleVins { get; init; } = [];
-    public double StartingBid { get; init; }
+    public CreateCollectiveAuctionRequest(DateTime? endDate, string[] vehicleVins, double startingBid)
+    {
+        EndDate = endDate;
+        VehicleVins = vehicleVins;
+        StartingBid = startingBid;
+    }
+    public DateTime? EndDate { get; set; }
+    public string[] VehicleVins { get; set; }
+    public double StartingBid { get; set; }
 }
 
 public class CreateCollectiveAuctionRequestValidator : AbstractValidator<CreateCollectiveAuctionRequest>

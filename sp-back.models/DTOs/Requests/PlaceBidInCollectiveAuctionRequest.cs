@@ -2,11 +2,17 @@
 
 namespace sp_back.models.DTOs.Requests;
 
-public class PlaceBidInCollectiveAuctionRequest
+public record PlaceBidInCollectiveAuctionRequest
 {
-    public required string BidderId { get; init; }
-    public required int AuctionId { get; init; }
-    public required double Amount { get; init; }
+    public PlaceBidInCollectiveAuctionRequest(string bidderId, int auctionId, double amount)
+    {
+        BidderId = bidderId;
+        AuctionId = auctionId;
+        Amount = amount;
+    }
+    public string BidderId { get; set; }
+    public int AuctionId { get; set; }
+    public double Amount { get; set; }
 }
 
 public class PlaceBidInCollectiveAuctionValidator : AbstractValidator<PlaceBidInCollectiveAuctionRequest>

@@ -4,12 +4,12 @@ namespace sp_back.models.DTOs.Requests;
 
 public record CreateVehicleSedanHatchbackRequest : CreateVehicleRequest
 {
-    public CreateVehicleSedanHatchbackRequest(string make, string model, DateTime productionDate, double startingPrice, string vin, uint numberOfDoors) : base(make, model, productionDate, startingPrice, vin)
+    public CreateVehicleSedanHatchbackRequest(string manufacturer, string model, DateTime productionDate, double startingPrice, string vin, uint numberOfDoors) : base(manufacturer, model, productionDate, startingPrice, vin)
     {
         NumberOfDoors = numberOfDoors;
     }
 
-    public uint NumberOfDoors { get; set; }
+    public uint NumberOfDoors { get; set;}
 }
 
 public class CreateVehicleSedanHatchbackValidator : AbstractValidator<CreateVehicleSedanHatchbackRequest>
@@ -19,7 +19,7 @@ public class CreateVehicleSedanHatchbackValidator : AbstractValidator<CreateVehi
         RuleFor(x => x.Vin)
             .NotEmpty();
         
-        RuleFor(x => x.Make)
+        RuleFor(x => x.Manufacturer)
             .NotEmpty();
 
         RuleFor(x => x.Model)

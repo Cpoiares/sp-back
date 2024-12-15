@@ -4,6 +4,7 @@ using sp_back.models.DTOs.Requests;
 using sp_back.models.Enums;
 using sp_back.models.Exceptions;
 using sp_back.models.Models.Vehicles;
+using InvalidOperationException = sp_back.models.Exceptions.InvalidOperationException;
 
 namespace sp_back_api.Services.Implementation;
 
@@ -21,33 +22,41 @@ public class VehicleService : IVehicleService
     }
     public async Task<Vehicle> CreateSedanAsync(CreateVehicleSedanHatchbackRequest request)
     {
+        _logger.LogInformation($"Creating Sedan Vehicle: Checking Vehicle Vin: {request.Vin}");
+
         if (CheckVehicleVin(request.Vin))
             throw new ValidationException("Vin already exists in database");
-        Sedan vehicle = new Sedan(request.Make, request.Model, request.ProductionDate, request.StartingPrice, request.Vin, request.NumberOfDoors);
+        Sedan vehicle = new Sedan(request.Manufacturer, request.Model, request.ProductionDate, request.StartingPrice, request.Vin, request.NumberOfDoors);
         return await _vehicleRepository.AddAsync(vehicle);
     }
     
     public async Task<Vehicle> CreateHatchbackAsync(CreateVehicleSedanHatchbackRequest request)
     {
+        _logger.LogInformation($"Creating Hatchback Vehicle: Checking Vehicle Vin: {request.Vin}");
+
         if (CheckVehicleVin(request.Vin))
             throw new ValidationException("Vin already exists in database");
-        Hatchback vehicle = new Hatchback(request.Make, request.Model, request.ProductionDate, request.StartingPrice, request.Vin, request.NumberOfDoors);
+        Hatchback vehicle = new Hatchback(request.Manufacturer, request.Model, request.ProductionDate, request.StartingPrice, request.Vin, request.NumberOfDoors);
         return await _vehicleRepository.AddAsync(vehicle);
     }
 
     public async Task<Vehicle> CreateTruckAsync(CreateVehicleTruckRequest request)
     {
+        _logger.LogInformation($"Creating Truck Vehicle: Checking Vehicle Vin: {request.Vin}");
+
         if (CheckVehicleVin(request.Vin))
             throw new ValidationException("Vin already exists in database");
-        Truck vehicle = new Truck(request.Make, request.Model, request.ProductionDate, request.StartingPrice, request.Vin, request.LoadCapacity);
+        Truck vehicle = new Truck(request.Manufacturer, request.Model, request.ProductionDate, request.StartingPrice, request.Vin, request.LoadCapacity);
         return await _vehicleRepository.AddAsync(vehicle);
     }
     
     public async Task<Vehicle> CreateSuvAsync(CreateVehicleSuvRequest request)
     {
+        _logger.LogInformation($"Creating Suv Vehicle: Checking Vehicle Vin: {request.Vin}");
+
         if (CheckVehicleVin(request.Vin))
             throw new ValidationException("Vin already exists in database");
-        Suv vehicle = new Suv(request.Make, request.Model, request.ProductionDate, request.StartingPrice, request.Vin, request.NumberOfSeats);
+        Suv vehicle = new Suv(request.Manufacturer, request.Model, request.ProductionDate, request.StartingPrice, request.Vin, request.NumberOfSeats);
         return await _vehicleRepository.AddAsync(vehicle);
     }
     
@@ -55,9 +64,13 @@ public class VehicleService : IVehicleService
     {
         try
         {
+            _logger.LogInformation($"Getting vehicle with id {id}");
+
             var vehicle = await _vehicleRepository.GetByIdAsync(id);
             if (vehicle == null)
                 throw new NotFoundException($"Vehicle with ID {id} not found");
+            
+            _logger.LogInformation($"Retrieving vehicle {vehicle}");
 
             return vehicle;
         }
@@ -89,6 +102,8 @@ public class VehicleService : IVehicleService
     {
         try
         {
+            _logger.LogInformation($"Getting vehicles for search criteria {searchParams.GetAsString()}");
+
             return await _vehicleRepository.SearchAsync(searchParams);
         }
         catch (Exception ex)
@@ -102,6 +117,8 @@ public class VehicleService : IVehicleService
     {
         try
         {
+            _logger.LogInformation($"Deleting vehicle with id {request.Id}");
+
             var vehicle = await _vehicleRepository.GetByIdAsync(request.Id)
                 ?? throw new NotFoundException($"Vehicle with ID {request.Id} not found");
 
@@ -109,6 +126,9 @@ public class VehicleService : IVehicleService
                 throw new InvalidOperationException("Vehicle is not available");
 
             await _vehicleRepository.DeleteAsync(request.Id);
+            
+            _logger.LogInformation($"Marked vehicle with id {request.Id} as deleted");
+
         }
         catch (Exception ex)
         {
@@ -121,21 +141,21 @@ public async Task<Vehicle> UpdateVehicleAsync(UpdateVehicleRequest request)
 {
     try
     {
+        _logger.LogInformation($"Initiating update on {request.Type} (Id: {request.Id})");
         var existingVehicle = await _vehicleRepository.GetByIdAsync(request.Id)
             ?? throw new NotFoundException($"Vehicle with ID {request.Id} not found");
 
         if (!existingVehicle.IsAvailable)
             throw new InvalidOperationException("Cannot update vehicle that is in auction");
 
-        // If changing vehicle type
         if (request.Type.HasValue && request.Type != existingVehicle.Type)
         {
-            // Create new vehicle of correct type using constructors
+            _logger.LogInformation($"Performing vehicle type change on {request.Type} (Id: {request.Id}) from {existingVehicle.Type} to {request.Type}");
             Vehicle updatedVehicle = request.Type switch
             {
                 VehicleType.Suv when request.NumberOfSeats.HasValue => 
                     new Suv(
-                        request.Make ?? existingVehicle.Make,
+                        request.Manufacturer ?? existingVehicle.Manufacturer,
                         request.Model ?? existingVehicle.Model,
                         request.ProductionDate ?? existingVehicle.ProductionDate,
                         request.StartingPrice ?? existingVehicle.StartingPrice,
@@ -144,7 +164,7 @@ public async Task<Vehicle> UpdateVehicleAsync(UpdateVehicleRequest request)
 
                 VehicleType.Sedan when request.NumberOfDoors.HasValue => 
                     new Sedan(
-                        request.Make ?? existingVehicle.Make,
+                        request.Manufacturer ?? existingVehicle.Manufacturer,
                         request.Model ?? existingVehicle.Model,
                         request.ProductionDate ?? existingVehicle.ProductionDate,
                         request.StartingPrice ?? existingVehicle.StartingPrice,
@@ -153,7 +173,7 @@ public async Task<Vehicle> UpdateVehicleAsync(UpdateVehicleRequest request)
 
                 VehicleType.Hatchback when request.NumberOfDoors.HasValue => 
                     new Hatchback(
-                        request.Make ?? existingVehicle.Make,
+                        request.Manufacturer ?? existingVehicle.Manufacturer,
                         request.Model ?? existingVehicle.Model,
                         request.ProductionDate ?? existingVehicle.ProductionDate,
                         request.StartingPrice ?? existingVehicle.StartingPrice,
@@ -162,7 +182,7 @@ public async Task<Vehicle> UpdateVehicleAsync(UpdateVehicleRequest request)
 
                 VehicleType.Truck when request.LoadCapacity.HasValue => 
                     new Truck(
-                        request.Make ?? existingVehicle.Make,
+                        request.Manufacturer ?? existingVehicle.Manufacturer,
                         request.Model ?? existingVehicle.Model,
                         request.ProductionDate ?? existingVehicle.ProductionDate,
                         request.StartingPrice ?? existingVehicle.StartingPrice,
@@ -196,7 +216,7 @@ public async Task<Vehicle> UpdateVehicleAsync(UpdateVehicleRequest request)
         }
 
         // Update common properties
-        if (request.Make != null) existingVehicle.Make = request.Make;
+        if (request.Manufacturer != null) existingVehicle.Manufacturer = request.Manufacturer;
         if (request.Model != null) existingVehicle.Model = request.Model;
         if (request.ProductionDate.HasValue) existingVehicle.ProductionDate = request.ProductionDate.Value;
         if (request.StartingPrice.HasValue) existingVehicle.StartingPrice = request.StartingPrice.Value;
@@ -221,7 +241,7 @@ public async Task<Vehicle> UpdateVehicleAsync(UpdateVehicleRequest request)
                     truck.LoadCapacity = request.LoadCapacity.Value;
                 break;
         }
-
+        _logger.LogInformation($"Updated vehicle with id {existingVehicle.Id}");
         return await _vehicleRepository.UpdateAsync(existingVehicle);
     }
     catch (Exception ex)

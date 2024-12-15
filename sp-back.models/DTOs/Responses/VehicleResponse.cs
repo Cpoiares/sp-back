@@ -5,7 +5,7 @@ namespace sp_back.models.DTOs.Responses;
 public record VehicleResponse
 {
     public int Id { get; set; }
-    public string Make { get; set; } = string.Empty;
+    public string Manufacturer { get; set; } = string.Empty;
     public string Model { get; set; } = string.Empty;
     public DateTime ProductionDate { get; set; }
     public double StartingPrice { get; set; }

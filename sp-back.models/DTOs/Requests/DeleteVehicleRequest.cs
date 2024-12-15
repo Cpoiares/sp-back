@@ -4,7 +4,12 @@ namespace sp_back.models.DTOs.Requests;
 
 public record DeleteVehicleRequest
 {
-    public int Id { get; set; }
+    public DeleteVehicleRequest(int id)
+    {
+        Id = id;
+    }
+
+    public int Id { get; set;}
 }
 
 public class DeleteVehicleValidator : AbstractValidator<DeleteVehicleRequest>
