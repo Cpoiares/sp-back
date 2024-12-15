@@ -276,7 +276,7 @@ public class AuctionService : IAuctionService
             
             if (request.Amount <= highestBidForVehicle.Amount)
                 throw new ValidationException(
-                    $"Bid must be at least {highestBidForVehicle.Amount}");
+                    $"Bid must be higher than {highestBidForVehicle.Amount}");
             
             _logger.LogInformation($"Placing new bid on vehicle {request.VehicleVin} Amount {request.Amount} by {request.BidderId}");
 

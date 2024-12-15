@@ -16,5 +16,5 @@ public interface IAuctionRepository
     Task<IEnumerable<Auction>> GetAllAuctionsAsync();
     Task<Auction> StartAuction(int id);
     Task CloseAuctionAsync(int auctionId);
-    Task<Auction> GetAuctionByIdAsync(int requestAuctionId);
+    Task<Auction?> GetAuctionByIdAsync(int requestAuctionId);
 }

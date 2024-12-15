@@ -55,6 +55,8 @@ public class AuctionRepository : IAuctionRepository
         try
         {
             return await _context.Auctions
+                .Include(a => a.Vehicles)
+                .Include(a => a.Bids)
                 .FirstOrDefaultAsync(a =>
                     (a.Vehicles.Any(v => v.Id == vehicleId) &&
                      (a.Status == AuctionStatus.Active)));
@@ -210,14 +212,14 @@ public class AuctionRepository : IAuctionRepository
         }
     }
     
-    public async Task<Auction> GetAuctionByIdAsync(int id)
+    public async Task<Auction?> GetAuctionByIdAsync(int id)
     {
         try
         {
             return await _context.Auctions
                 .Include(a => a.Vehicles)
                 .Include(a => a.Bids)
-                .FirstAsync(a => a.Id == id);
+                .FirstOrDefaultAsync(a => a.Id == id);
         }
         catch (Exception ex)
         {

@@ -22,12 +22,53 @@ public class ExceptionHandlingMiddleware
         try
         {
             await _next(context);
+
+            if (!context.Response.HasStarted)
+            {
+                switch (context.Response.StatusCode)
+                {
+                    case StatusCodes.Status404NotFound:
+                        await HandleNotFoundResponse(context);
+                        break;
+                    case StatusCodes.Status400BadRequest:
+                        await HandleBadRequestResponse(context);
+                        break;
+                }
+            }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred");
             await HandleExceptionAsync(context, ex);
         }
+    }
+
+    private static async Task HandleNotFoundResponse(HttpContext context)
+    {
+        var response = context.Response;
+        response.ContentType = "application/json";
+
+        var errorResponse = new ErrorResponse
+        {
+            TraceId = context.TraceIdentifier,
+            Message = "The requested endpoint was not found. Please check the URL and try again."
+        };
+
+        await response.WriteAsJsonAsync(errorResponse);
+    }
+
+    private static async Task HandleBadRequestResponse(HttpContext context)
+    {
+        var response = context.Response;
+        response.ContentType = "application/json";
+
+        var errorResponse = new ErrorResponse
+        {
+            TraceId = context.TraceIdentifier,
+            Message = "Invalid request format. Please check your request parameters and try again."
+        };
+
+        await response.WriteAsJsonAsync(errorResponse);
     }
 
     private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
