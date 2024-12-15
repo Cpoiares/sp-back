@@ -57,4 +57,27 @@ public static class AuctionResponseHandler
             EndDate = auction.EndTime ?? DateTime.UtcNow,
         };
     }
+    
+    public static AuctionBidHistoryResponse BuildBidHistoryResponse(Auction auction)
+    {
+        return new AuctionBidHistoryResponse()
+        {
+            AuctionId = auction.Id,
+            IsCollectiveAuction = auction.IsCollectiveAuction,
+            Bids = auction.Bids.OrderBy(a => a.BidTime).Select(b =>
+            {
+                var vehicleId = auction.IsCollectiveAuction ? auction.Vehicles[0].Id : b.VehicleId;
+                var highestBid = auction.GetHighestBinInHistoryForVehicle(vehicleId);
+            
+                return new AuctionBids()
+                {
+                    BidAmount = b.Amount,
+                    BidderId = b.BidderId,
+                    BidTime = b.BidTime,
+                    VehicleId = auction.IsCollectiveAuction ? null : b.VehicleId,
+                    IsWinnerBid = highestBid != null && highestBid.Id == b.Id
+                };
+            }).ToList()
+        };
+    }
 }

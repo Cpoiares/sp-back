@@ -11,7 +11,13 @@ public class Suv : Vehicle
         Type = VehicleType.Suv;
     }
 
-    public uint NumberOfSeats { get; set; }
+    private uint _numberOfSeats { get; set; }
+    
+    public uint NumberOfSeats
+    {
+        get => _numberOfSeats;
+        set => _numberOfSeats = value;
+    }
     public override VehicleResponse GetVehicleResponses()
     {
         return new GetVehicleSuvResponse()

@@ -131,7 +131,7 @@ public class VehicleServiceTests : IDisposable
 
         // Assert
         await act.Should().ThrowAsync<ValidationException>()
-            .WithMessage("*VIN already exists*");
+            .WithMessage("*already exists in database*");
     }
 
     [Fact]

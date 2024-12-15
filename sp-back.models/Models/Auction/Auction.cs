@@ -5,53 +5,108 @@ namespace sp_back.models.Models.Auction;
 
 public class Auction
 {
-    public List<Bid> Bids { get; set; }
-    public List<Vehicle> Vehicles { get; set; }
+    private List<Bid> _bids;
+    private List<Vehicle> _vehicles;
+    private int _id;
+    private DateTime? _startTime;
+    private DateTime? _endTime;
+    private AuctionStatus _status;
+    private bool _isCollectiveAuction;
+
+    public List<Bid> Bids
+    {
+        get => _bids;
+        set => _bids = value;
+    }
+
+    public List<Vehicle> Vehicles
+    {
+        get => _vehicles;
+        set => _vehicles = value;
+    }
+
+    public int Id
+    {
+        get => _id;
+        set => _id = value;
+    }
+
+    public DateTime? StartTime
+    {
+        get => _startTime;
+        set => _startTime = value;
+    }
+
+    public DateTime? EndTime
+    {
+        get => _endTime;
+        set => _endTime = value;
+    }
+
+    public AuctionStatus Status
+    {
+        get => _status;
+        set => _status = value;
+    }
+
+    public bool IsCollectiveAuction
+    {
+        get => _isCollectiveAuction;
+        set => _isCollectiveAuction = value;
+    }
 
     public Auction()
     {
-        Status = AuctionStatus.Waiting;
-        Vehicles = [];
-        Bids = [];
+        _status = AuctionStatus.Waiting;
+        _vehicles = [];
+        _bids = [];
     }
     
     public Auction(DateTime? endTime, bool isCollectiveAuction = false)
         : this()
     {
-        EndTime = endTime;
-        IsCollectiveAuction = isCollectiveAuction;
+        _endTime = endTime;
+        _isCollectiveAuction = isCollectiveAuction;
     }
-    
-    public int Id { get; set; }
-    public DateTime? StartTime { get; set; }
-    public DateTime? EndTime { get; set; }
-    public AuctionStatus Status { get; set; }
-    public bool IsCollectiveAuction { get; set; }
     
     public Bid GetHighestBidForVehicle(int vehicleId)
     {
-        var vehicle = Vehicles.FirstOrDefault(v => v.Id == vehicleId);
+        var vehicle = _vehicles.FirstOrDefault(v => v.Id == vehicleId);
         if (vehicle == null)
             throw new InvalidOperationException($"Vehicle {vehicleId} is not part of this auction");
 
-        var highestBid = Bids
+        var highestBid = _bids
             .Where(b => b.VehicleId == vehicleId)
             .MaxBy(b => b.Amount);
 
         return highestBid ?? new Bid("", vehicle, this, vehicle.StartingPrice);
     }
-
-    public Bid? GetBidInformation(string bidderId, string vehicleVin)
+    
+    public Bid? GetHighestBinInHistoryForVehicle(int vehicleId)
     {
-        return Bids.Where(b => b.BidderId == bidderId && b.Vehicle?.Vin == vehicleVin).MaxBy(b => b.Amount);
-    }
-    public string? GetHighestBidderForVehicle(int vehicleId)
-    {
-        var vehicle = Vehicles.FirstOrDefault(v => v.Id == vehicleId);
+        var vehicle = _vehicles.FirstOrDefault(v => v.Id == vehicleId);
         if (vehicle == null)
             throw new InvalidOperationException($"Vehicle {vehicleId} is not part of this auction");
 
-        var highestBid = Bids
+        var highestBid = _bids
+            .Where(b => b.VehicleId == vehicleId)
+            .MaxBy(b => b.Amount);
+
+        return highestBid;
+    }
+
+    public Bid? GetBidInformation(string bidderId, string vehicleVin)
+    {
+        return _bids.Where(b => b.BidderId == bidderId && b.Vehicle?.Vin == vehicleVin).MaxBy(b => b.Amount);
+    }
+
+    public string? GetHighestBidderForVehicle(int vehicleId)
+    {
+        var vehicle = _vehicles.FirstOrDefault(v => v.Id == vehicleId);
+        if (vehicle == null)
+            throw new InvalidOperationException($"Vehicle {vehicleId} is not part of this auction");
+
+        var highestBid = _bids
             .Where(b => b.VehicleId == vehicleId)
             .MaxBy(b => b.Amount);
 
@@ -60,10 +115,9 @@ public class Auction
     
     public Bid PlaceBid(string bidderId, double amount, int vehicleId)
     {
-
-        var vehicle = Vehicles.First(v => v.Id == vehicleId);
+        var vehicle = _vehicles.First(v => v.Id == vehicleId);
         var bid = new Bid(bidderId, vehicle, this, amount);
-        Bids.Add(bid);
+        _bids.Add(bid);
 
         return bid;
     }
@@ -71,7 +125,7 @@ public class Auction
     public IEnumerable<Bid> PlaceCollectiveBid(string bidderId, double amount)
     {
         var bids = new List<Bid>();
-        foreach (var vehicle in Vehicles)
+        foreach (var vehicle in _vehicles)
         {
             var bid = PlaceBid(bidderId, amount, vehicle.Id);
             bids.Add(bid);
@@ -82,21 +136,19 @@ public class Auction
     
     public IEnumerable<Vehicle> AddVehicles(List<Vehicle> vehicles)
     {
-        Vehicles.AddRange(vehicles);
-
-        return Vehicles;
+        _vehicles.AddRange(vehicles);
+        return _vehicles;
     }
     
     public IEnumerable<Vehicle> RemoveVehicles(List<Vehicle> vehicles)
     {
         foreach (var vehicle in vehicles)
         {
-            Vehicles.Remove(vehicle);
+            _vehicles.Remove(vehicle);
         }
 
-        return Vehicles;
+        return _vehicles;
     }
-    
 }
     
     

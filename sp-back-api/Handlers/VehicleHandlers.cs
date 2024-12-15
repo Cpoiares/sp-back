@@ -23,7 +23,7 @@ public static class VehicleHandlers
     }
 
     public static async Task<IResult> GetVehicleById(
-        [FromQuery] int id, 
+        int id, 
         IVehicleService vehicleService)
     {
         var vehicle = await vehicleService.GetVehicleAsync(id);

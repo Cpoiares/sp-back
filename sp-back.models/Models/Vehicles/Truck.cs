@@ -11,7 +11,12 @@ public class Truck : Vehicle
         Type = VehicleType.Truck;
     }
 
-    public double LoadCapacity { get; set; }
+    private double _loadCapacity { get; set; }
+    public double LoadCapacity
+    {
+        get => _loadCapacity;
+        set => _loadCapacity = value;
+    }
 
     public override VehicleResponse GetVehicleResponses()
     {

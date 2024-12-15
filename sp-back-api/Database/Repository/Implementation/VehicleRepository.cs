@@ -22,7 +22,7 @@ public class VehicleRepository : IVehicleRepository
         try
         {
             return await _context.Vehicles
-                .FirstOrDefaultAsync(v => v.Id == id);
+                .FirstOrDefaultAsync(v => v.Id == id && !v.IsDeleted);
         }
         catch (Exception ex)
         {
@@ -36,7 +36,7 @@ public class VehicleRepository : IVehicleRepository
         try
         {
             return await _context.Vehicles
-                .FirstOrDefaultAsync(v => v.Vin == vin);
+                .FirstOrDefaultAsync(v => v.Vin == vin && !v.IsDeleted);
         }
         catch (Exception ex)
         {
@@ -138,7 +138,7 @@ public class VehicleRepository : IVehicleRepository
     {
         try
         {
-            var vehicle = await _context.Vehicles.FindAsync(id);
+            var vehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.Id == id && !v.IsDeleted);
             if (vehicle != null)
             {
                 vehicle.IsDeleted = true;
@@ -155,18 +155,18 @@ public class VehicleRepository : IVehicleRepository
 
     public bool CheckIfVinExists(string requestVin)
     {
-        return _context.Vehicles.Any(v => v.Vin == requestVin);
+        return _context.Vehicles.Any(v => v.Vin == requestVin && !v.IsDeleted);
     }
 
-    public Task MarkVehicleAsSold(int vehicleId, string buyerId)
+    public async Task MarkVehicleAsSold(int vehicleId, string buyerId)
     {
         try
         {
-            var vehicle = _context.Vehicles.Find(vehicleId);
+            var vehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.Id == vehicleId && !v.IsDeleted);
             if(vehicle == null) throw new NotFoundException($"Vehicle with ID {vehicleId} not found");
             vehicle.BuyerId = buyerId;
             _context.Vehicles.Update(vehicle);
-            return _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
         catch (Exception ex)
         {

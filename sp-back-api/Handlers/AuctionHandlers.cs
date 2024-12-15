@@ -166,6 +166,14 @@ public static class AuctionHandlers
         var auction = await auctionService.PlaceBidInCollectiveAuction(request);
         return Results.Ok(AuctionResponseHandler.BuildStartResponse(auction));
     }
+    
+    public static async Task<IResult> GetAuctionBidHistory(
+        int auctionId, 
+        IAuctionService auctionService)
+    {
+        var auction = await auctionService.GetAuctionAsync(auctionId);
+        return Results.Ok(AuctionResponseHandler.BuildBidHistoryResponse(auction));
+    }
 
     public static async Task<IResult> GetCompletedAuctions(IAuctionService auctionService)
     {
@@ -175,4 +183,7 @@ public static class AuctionHandlers
             Auctions = auctions.Select(a => AuctionResponseHandler.BuildResponse(a)).ToList()
         };
         return Results.Ok(response);
-    }}
+    }
+    
+    
+}

@@ -11,7 +11,12 @@ public class Hatchback : Vehicle
         Type = VehicleType.Hatchback;
     }
 
-    public uint NumberOfDoors { get; set; }
+    private uint _numberOfDoors { get; set; }
+    public uint NumberOfDoors
+    {
+        get => _numberOfDoors;
+        set => _numberOfDoors = value;
+    }
     public override VehicleResponse GetVehicleResponses()
     {
         return new GetVehicleSedanHatchbackResponse()

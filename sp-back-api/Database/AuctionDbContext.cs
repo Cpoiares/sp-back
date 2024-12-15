@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using sp_back_api.Database.Data;
+using sp_back.models.Enums;
 using sp_back.models.Models.Auction;
 using sp_back.models.Models.Vehicles;
 
@@ -29,8 +30,7 @@ public class AuctionDbContext : DbContext
             
             entity.HasMany(a => a.Vehicles)
                 .WithOne(v => v.Auction)
-                .HasForeignKey(v => v.AuctionId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(v => v.AuctionId);
 
             entity.HasMany(a => a.Bids)
                 .WithOne(b => b.Auction)
@@ -63,6 +63,12 @@ public class AuctionDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
 
+            entity.HasDiscriminator<VehicleType>("Type")
+                .HasValue<Sedan>(VehicleType.Sedan)
+                .HasValue<Suv>(VehicleType.Suv)
+                .HasValue<Truck>(VehicleType.Truck)
+                .HasValue<Hatchback>(VehicleType.Hatchback);
+
             entity.Property(e => e.Id)
                 .ValueGeneratedOnAdd();
             
@@ -84,6 +90,43 @@ public class AuctionDbContext : DbContext
                 .IsRequired();
             
             entity.Property(e => e.IsAvailable)
+                .IsRequired();
+            
+            entity.Property(e => e.BuyerId);
+    
+            entity.Property(e => e.Vin)
+                .IsRequired();
+    
+            entity.Property(e => e.IsDeleted)
+                .IsRequired();
+
+            entity.HasOne(v => v.Auction)
+                .WithMany(a => a.Vehicles)
+                .HasForeignKey(v => v.AuctionId);
+        });
+        
+        modelBuilder.Entity<Sedan>(entity =>
+        {
+            entity.Property(s => s.NumberOfDoors)
+                .IsRequired();
+        });
+
+        modelBuilder.Entity<Suv>(entity =>
+        {
+            entity.Property(s => s.NumberOfSeats)
+                .IsRequired();
+        });
+
+        modelBuilder.Entity<Truck>(entity =>
+        {
+            entity.Property(t => t.LoadCapacity)
+                .IsRequired()
+                .HasColumnType("double");
+        });
+
+        modelBuilder.Entity<Hatchback>(entity =>
+        {
+            entity.Property(h => h.NumberOfDoors)
                 .IsRequired();
         });
         

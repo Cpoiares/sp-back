@@ -25,7 +25,7 @@ public class VehicleService : IVehicleService
         _logger.LogInformation($"Creating Sedan Vehicle: Checking Vehicle Vin: {request.Vin}");
 
         if (CheckVehicleVin(request.Vin))
-            throw new ValidationException("Vin already exists in database");
+            throw new ValidationException($"Vin {request.Vin} already exists in database");
         Sedan vehicle = new Sedan(request.Manufacturer, request.Model, request.ProductionDate, request.StartingPrice, request.Vin, request.NumberOfDoors);
         return await _vehicleRepository.AddAsync(vehicle);
     }
@@ -35,7 +35,7 @@ public class VehicleService : IVehicleService
         _logger.LogInformation($"Creating Hatchback Vehicle: Checking Vehicle Vin: {request.Vin}");
 
         if (CheckVehicleVin(request.Vin))
-            throw new ValidationException("Vin already exists in database");
+            throw new ValidationException($"Vin {request.Vin} already exists in database");
         Hatchback vehicle = new Hatchback(request.Manufacturer, request.Model, request.ProductionDate, request.StartingPrice, request.Vin, request.NumberOfDoors);
         return await _vehicleRepository.AddAsync(vehicle);
     }
@@ -45,7 +45,7 @@ public class VehicleService : IVehicleService
         _logger.LogInformation($"Creating Truck Vehicle: Checking Vehicle Vin: {request.Vin}");
 
         if (CheckVehicleVin(request.Vin))
-            throw new ValidationException("Vin already exists in database");
+            throw new ValidationException($"Vin {request.Vin} already exists in database");
         Truck vehicle = new Truck(request.Manufacturer, request.Model, request.ProductionDate, request.StartingPrice, request.Vin, request.LoadCapacity);
         return await _vehicleRepository.AddAsync(vehicle);
     }
@@ -55,7 +55,7 @@ public class VehicleService : IVehicleService
         _logger.LogInformation($"Creating Suv Vehicle: Checking Vehicle Vin: {request.Vin}");
 
         if (CheckVehicleVin(request.Vin))
-            throw new ValidationException("Vin already exists in database");
+            throw new ValidationException($"Vin {request.Vin} already exists in database");
         Suv vehicle = new Suv(request.Manufacturer, request.Model, request.ProductionDate, request.StartingPrice, request.Vin, request.NumberOfSeats);
         return await _vehicleRepository.AddAsync(vehicle);
     }
@@ -123,7 +123,7 @@ public class VehicleService : IVehicleService
                 ?? throw new NotFoundException($"Vehicle with ID {request.Id} not found");
 
             if (!vehicle.IsAvailable)
-                throw new InvalidOperationException("Vehicle is not available");
+                throw new InvalidOperationException("Vehicle is not available for deletion as its part of an ongoing auction");
 
             await _vehicleRepository.DeleteAsync(request.Id);
             

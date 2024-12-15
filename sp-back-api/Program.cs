@@ -24,7 +24,6 @@ using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 var builder = WebApplication.CreateBuilder(args);
 var projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../.."));
 
-// TODO: Need to validate is deleted and is sold every to prevent updates or deletes in deleted or sold vehicles
 builder.Configuration
     .SetBasePath(projectRoot)
     .AddJsonFile(Path.Combine("conf", "appsettings.json"), optional: false, reloadOnChange: true)
@@ -93,7 +92,7 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.MapGet("/vehicles", VehicleHandlers.GetVehicles)
     .WithName("GetVehicles");
     
-app.MapGet("/vehicles/{id}", VehicleHandlers.GetVehicleById)
+app.MapGet("/vehicles/{id:int}", VehicleHandlers.GetVehicleById)
     .WithName("GetVehicle")
     .ProducesProblem(StatusCodes.Status400BadRequest)
     .ProducesProblem(StatusCodes.Status404NotFound);
@@ -179,6 +178,12 @@ app.MapPost("/auctions/close", AuctionHandlers.CloseAuction)
 app.MapPost("/auctions/start", AuctionHandlers.StartAuction)
     .WithName("StartAuction")
     .Produces<StartAuctionResponse>()
+    .ProducesProblem(StatusCodes.Status400BadRequest)
+    .ProducesProblem(StatusCodes.Status404NotFound);
+
+app.MapPost("/auctions/bid-history", AuctionHandlers.GetAuctionBidHistory)
+    .WithName("GetAuctionBidHistory")
+    .Produces<AuctionBidHistoryResponse>()
     .ProducesProblem(StatusCodes.Status400BadRequest)
     .ProducesProblem(StatusCodes.Status404NotFound);
 

@@ -5,13 +5,18 @@ namespace sp_back.models.Models.Vehicles;
 
 public class Sedan : Vehicle
 {
+    private uint _numberOfDoors;
     public Sedan(string manufacturer, string model, DateTime productionDate, double startingPrice, string vin, uint numberOfDoors) : base(manufacturer, model, productionDate, startingPrice, vin)
     {
         NumberOfDoors = numberOfDoors;
         Type = VehicleType.Sedan;
     }
-
-    public uint NumberOfDoors { get; set; }
+    
+    public uint NumberOfDoors
+    {
+        get => _numberOfDoors;
+        set => _numberOfDoors = value;
+    }
     public override VehicleResponse GetVehicleResponses()
     {
         return new GetVehicleSedanHatchbackResponse()
