@@ -4,4 +4,5 @@ public class CloseAuctionResponse
 {
     public DateTime EndDate { get; set; }
     public List<AuctionVehicles> Vehicles { get; set; } = [];
+    public int AuctionId { get; set; }
 }

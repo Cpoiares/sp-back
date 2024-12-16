@@ -38,7 +38,8 @@ public class AuctionService : IAuctionService
         {
             _logger.LogInformation($"Creating Auction with the following vehicles: {string.Join(",", request.VehicleVins)}");
 
-            var auctionVehicles = new List<Vehicle>();
+            var auction = new Auction(request.EndDate, false);
+
             foreach (var vin in request.VehicleVins)
             {
                 _logger.LogInformation($"Processing Vehicle {vin}");
@@ -55,18 +56,13 @@ public class AuctionService : IAuctionService
                     throw new InvalidOperationException($"Vehicle with vin {vin} is not available for auction as it was already sold");
 
                 vehicle.IsAvailable = false;
-                auctionVehicles.Add(vehicle);
+                auction.AddVehicle(vehicle);
             }
-            var auction = new Auction
-            {
-                Vehicles = auctionVehicles,
-                Status = AuctionStatus.Waiting,
-                EndTime = request.EndDate,
-            };
-            
-            await _vehicleService.LockVehicleInAuction(auctionVehicles);
-            _logger.LogInformation($"Vehicles are locked - Creating new auction");
-            return await _auctionRepository.AddAsync(auction);
+            await _vehicleService.LockVehicleInAuction(auction.Vehicles);
+            _logger.LogInformation($"Vehicles now are locked - Creating new auction");
+            auction = await _auctionRepository.AddAsync(auction);
+            _logger.LogInformation($"Created new auction with ID {auction.Id}");
+            return auction;
         }
         catch (Exception ex)
         {
@@ -111,7 +107,7 @@ public class AuctionService : IAuctionService
         {
             _logger.LogInformation($"Creating Collective Auction with the following vehicles: {string.Join(",", request.VehicleVins)}");
             
-            var auctionVehicles = new List<Vehicle>();
+            var auction = new Auction(request.EndDate, true);
 
             foreach (var vin in request.VehicleVins)
             {
@@ -129,24 +125,15 @@ public class AuctionService : IAuctionService
                     throw new InvalidOperationException("Vehicle is not available for auction as it was already sold");
 
                 vehicle.StartingPrice = request.StartingBid;
-                auctionVehicles.Add(vehicle);
+                auction.AddVehicle(vehicle);
             }
 
-            var auction = new Auction
-            {
-                Vehicles = auctionVehicles,
-                Status = AuctionStatus.Waiting,
-                IsCollectiveAuction = true,
-                EndTime = request.EndDate,
-            };
 
-
-
-            await _vehicleService.LockVehicleInAuction(auctionVehicles);
-            
-            _logger.LogInformation($"Vehicles are locked - Creating new auction");
-
-            return await _auctionRepository.AddAsync(auction);
+            await _vehicleService.LockVehicleInAuction(auction.Vehicles);
+            _logger.LogInformation($"Vehicles now are locked - Creating new auction");
+            auction = await _auctionRepository.AddAsync(auction);
+            _logger.LogInformation($"Auction with ID {auction.Id} Created");
+            return auction;
         }
         catch (Exception ex)
         {

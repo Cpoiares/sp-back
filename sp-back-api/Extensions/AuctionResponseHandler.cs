@@ -29,6 +29,7 @@ public static class AuctionResponseHandler
     {
         return new StartAuctionResponse()
         {
+            AuctionId = auction.Id,
             Vehicles = auction.Vehicles.Select(v =>  new AuctionVehicles()
             {
                 Vin = v.Vin,
@@ -46,6 +47,7 @@ public static class AuctionResponseHandler
     {
         return new CloseAuctionResponse()
         {
+            AuctionId = auction.Id,
             Vehicles = auction.Vehicles.Select(v =>  new AuctionVehicles()
             {
                 Vin = v.Vin,
