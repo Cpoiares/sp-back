@@ -38,7 +38,7 @@ public class AuctionService : IAuctionService
         {
             _logger.LogInformation($"Creating Auction with the following vehicles: {string.Join(",", request.VehicleVins)}");
 
-            var auction = new Auction(request.EndDate, false);
+            var auction = new Auction(request.EndDate);
 
             foreach (var vin in request.VehicleVins)
             {
