@@ -503,13 +503,12 @@ public class AuctionService : IAuctionService
             foreach (var vehicle in vehiclesToAdd)
             {
                 vehicle.StartingPrice = auction.IsCollectiveAuction ? auction.Vehicles.First().StartingPrice : vehicle.StartingPrice;
-                auction.Vehicles.Add(vehicle);
+                auction.AddVehicle(vehicle);
             }
-
-            var updatedAuction = await _auctionRepository.UpdateAsync(auction);
+            await _auctionRepository.UpdateAsync(auction);
             _logger.LogInformation("Added {Count} vehicles to auction {AuctionId}", vehiclesToAdd.Count, request.AuctionId);
 
-            return updatedAuction;
+            return auction;
         }
         catch (Exception ex)
         {
@@ -539,22 +538,17 @@ public class AuctionService : IAuctionService
             
                 if (auction.Bids.Any(b => b.VehicleId == vehicle.Id))
                     throw new ValidationException($"Cannot remove vehicle {vehicleVin} as it has existing bids");
-            }
-
-            // Remove vehicles from auction and mark them as available
-            foreach (var vehicleVin in request.VehicleVins)
-            {
-                var vehicle = auction.Vehicles.First(v => v.Vin == vehicleVin);
-                auction.Vehicles.Remove(vehicle);
-            
+                
+                auction.RemoveVehicle(vehicle);
                 vehicle.IsAvailable = true;
                 await _vehicleRepository.UpdateAsync(vehicle);
+                await _auctionRepository.UpdateAsync(auction);
+                _logger.LogInformation("Removed {Vin} vehicles from auction {AuctionId}", vehicleVin, request.AuctionId);
             }
 
-            var updatedAuction = await _auctionRepository.UpdateAsync(auction);
             _logger.LogInformation("Removed {Count} vehicles from auction {AuctionId}", request.VehicleVins.Count(), request.AuctionId);
 
-            return updatedAuction;
+            return auction;
         }
         catch (Exception ex)
         {

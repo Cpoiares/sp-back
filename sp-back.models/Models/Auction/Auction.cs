@@ -134,20 +134,19 @@ public class Auction
         return bids;
     }
     
-    public IEnumerable<Vehicle> AddVehicles(List<Vehicle> vehicles)
+    public IEnumerable<Vehicle> AddVehicle(Vehicle vehicle)
     {
-        _vehicles.AddRange(vehicles);
-        return _vehicles;
+        Vehicles.Add(vehicle);
+        return Vehicles;
     }
     
-    public IEnumerable<Vehicle> RemoveVehicles(List<Vehicle> vehicles)
+    
+    public IEnumerable<Vehicle> RemoveVehicle(Vehicle vehicle)
     {
-        foreach (var vehicle in vehicles)
-        {
-            _vehicles.Remove(vehicle);
-        }
 
-        return _vehicles;
+        Vehicles.Remove(vehicle);
+
+        return Vehicles;
     }
 }
     
