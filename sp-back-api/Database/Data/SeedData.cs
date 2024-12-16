@@ -66,7 +66,7 @@ public static class SeedData
     {
         return new[]
         {
-            new Bid("winner123")
+            new Bid("winner1")
             {
                 Id = 1,
                 Amount = 40000.0,
@@ -74,7 +74,7 @@ public static class SeedData
                 AuctionId = 1, // First auction ID
                 VehicleId = 1  // Mazda's ID
             },
-            new Bid("winner1235")
+            new Bid("winner2")
             {
                 Id = 2,
                 Amount = 30000.0,

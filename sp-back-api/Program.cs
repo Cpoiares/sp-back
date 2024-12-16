@@ -38,6 +38,7 @@ builder.Logging.AddSimpleConsole(options =>
 {
     options.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
 });
+
 builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
 builder.Services.AddScoped<IAuctionRepository, AuctionRepository>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
@@ -85,7 +86,12 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Auction API");
+    options.RoutePrefix = string.Empty;
+});
+
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Vehicle endpoints
@@ -181,7 +187,7 @@ app.MapPost("/auctions/start", AuctionHandlers.StartAuction)
     .ProducesProblem(StatusCodes.Status400BadRequest)
     .ProducesProblem(StatusCodes.Status404NotFound);
 
-app.MapPost("/auctions/bid-history", AuctionHandlers.GetAuctionBidHistory)
+app.MapGet("/auctions/bid-history/{id:int}", AuctionHandlers.GetAuctionBidHistory)
     .WithName("GetAuctionBidHistory")
     .Produces<AuctionBidHistoryResponse>()
     .ProducesProblem(StatusCodes.Status400BadRequest)

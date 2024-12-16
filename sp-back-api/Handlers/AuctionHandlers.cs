@@ -168,10 +168,10 @@ public static class AuctionHandlers
     }
     
     public static async Task<IResult> GetAuctionBidHistory(
-        int auctionId, 
+        int id, 
         IAuctionService auctionService)
     {
-        var auction = await auctionService.GetAuctionAsync(auctionId);
+        var auction = await auctionService.GetAuctionAsync(id);
         return Results.Ok(AuctionResponseHandler.BuildBidHistoryResponse(auction));
     }
 
