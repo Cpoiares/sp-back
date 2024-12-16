@@ -27,7 +27,9 @@ public class VehicleService : IVehicleService
         if (CheckVehicleVin(request.Vin))
             throw new ValidationException($"Vin {request.Vin} already exists in database");
         Sedan vehicle = new Sedan(request.Manufacturer, request.Model, request.ProductionDate, request.StartingPrice, request.Vin, request.NumberOfDoors);
-        return await _vehicleRepository.AddAsync(vehicle);
+        var v = await _vehicleRepository.AddAsync(vehicle);
+        _logger.LogInformation($"Created Sedan Vehicle: {v.Id}");
+        return v;
     }
     
     public async Task<Vehicle> CreateHatchbackAsync(CreateVehicleSedanHatchbackRequest request)
@@ -37,7 +39,9 @@ public class VehicleService : IVehicleService
         if (CheckVehicleVin(request.Vin))
             throw new ValidationException($"Vin {request.Vin} already exists in database");
         Hatchback vehicle = new Hatchback(request.Manufacturer, request.Model, request.ProductionDate, request.StartingPrice, request.Vin, request.NumberOfDoors);
-        return await _vehicleRepository.AddAsync(vehicle);
+        var v = await _vehicleRepository.AddAsync(vehicle);
+        _logger.LogInformation($"Created Hatchback Vehicle: {v.Id}");
+        return v;
     }
 
     public async Task<Vehicle> CreateTruckAsync(CreateVehicleTruckRequest request)
@@ -47,7 +51,9 @@ public class VehicleService : IVehicleService
         if (CheckVehicleVin(request.Vin))
             throw new ValidationException($"Vin {request.Vin} already exists in database");
         Truck vehicle = new Truck(request.Manufacturer, request.Model, request.ProductionDate, request.StartingPrice, request.Vin, request.LoadCapacity);
-        return await _vehicleRepository.AddAsync(vehicle);
+        var v = await _vehicleRepository.AddAsync(vehicle);
+        _logger.LogInformation($"Created Truck Vehicle: {v.Id}");
+        return v;
     }
     
     public async Task<Vehicle> CreateSuvAsync(CreateVehicleSuvRequest request)
@@ -57,7 +63,9 @@ public class VehicleService : IVehicleService
         if (CheckVehicleVin(request.Vin))
             throw new ValidationException($"Vin {request.Vin} already exists in database");
         Suv vehicle = new Suv(request.Manufacturer, request.Model, request.ProductionDate, request.StartingPrice, request.Vin, request.NumberOfSeats);
-        return await _vehicleRepository.AddAsync(vehicle);
+        var v = await _vehicleRepository.AddAsync(vehicle);
+        _logger.LogInformation($"Created Suv Vehicle: {v.Id}");
+        return v;
     }
     
     public async Task<Vehicle> GetVehicleAsync(int id)
@@ -77,23 +85,6 @@ public class VehicleService : IVehicleService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving vehicle: {Id}", id);
-            throw;
-        }
-    }
-    
-    public async Task<Vehicle> GetVehicleByVin(string vin)
-    {
-        try
-        {
-            var vehicle = await _vehicleRepository.GetByVinAsync(vin);
-            if (vehicle == null)
-                throw new NotFoundException($"Vehicle with vin {vin} not found");
-
-            return vehicle;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error retrieving vehicle: {Id}", vin);
             throw;
         }
     }
@@ -195,8 +186,9 @@ public async Task<Vehicle> UpdateVehicleAsync(UpdateVehicleRequest request)
             // Maintain the same ID and availability
             updatedVehicle.Id = existingVehicle.Id;
             updatedVehicle.IsAvailable = existingVehicle.IsAvailable;
-
-            return await _vehicleRepository.UpdateAsync(updatedVehicle);
+            var v = await _vehicleRepository.UpdateAsync(updatedVehicle);
+            _logger.LogInformation($"Updated vehicle with id {existingVehicle.Id}");
+            return v;
         }
 
         // If not changing type, update only allowed properties for current type
@@ -215,13 +207,11 @@ public async Task<Vehicle> UpdateVehicleAsync(UpdateVehicleRequest request)
                 throw new ValidationException("Cannot add doors or seats to Truck");
         }
 
-        // Update common properties
         if (request.Manufacturer != null) existingVehicle.Manufacturer = request.Manufacturer;
         if (request.Model != null) existingVehicle.Model = request.Model;
         if (request.ProductionDate.HasValue) existingVehicle.ProductionDate = request.ProductionDate.Value;
         if (request.StartingPrice.HasValue) existingVehicle.StartingPrice = request.StartingPrice.Value;
 
-        // Update type-specific properties
         switch (existingVehicle)
         {
             case Suv suv:
@@ -241,8 +231,9 @@ public async Task<Vehicle> UpdateVehicleAsync(UpdateVehicleRequest request)
                     truck.LoadCapacity = request.LoadCapacity.Value;
                 break;
         }
+        var update = await _vehicleRepository.UpdateAsync(existingVehicle);
         _logger.LogInformation($"Updated vehicle with id {existingVehicle.Id}");
-        return await _vehicleRepository.UpdateAsync(existingVehicle);
+        return update;
     }
     catch (Exception ex)
     {
@@ -257,6 +248,7 @@ public async Task<Vehicle> UpdateVehicleAsync(UpdateVehicleRequest request)
         {
             v.IsAvailable = false;
             await _vehicleRepository.UpdateAsync(v);
+            _logger.LogInformation($"Successfully locked vehicle with id {v.Id}");
         }
     }
     

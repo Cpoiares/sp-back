@@ -212,6 +212,7 @@ public class AuctionService : IAuctionService
             if (auction == null)
                 throw new NotFoundException($"Auction with ID {id} not found");
 
+            _logger.LogInformation($"Retrieved auction with id {id}");
             return auction;
         }
         catch (Exception ex)
@@ -226,8 +227,9 @@ public class AuctionService : IAuctionService
         try
         {
             _logger.LogInformation($"Getting all active auctions");
-
-            return await _auctionRepository.GetActiveAuctionsAsync();
+            var auctions = await _auctionRepository.GetActiveAuctionsAsync();
+            _logger.LogInformation($"Retrieving list of active auctions");
+            return auctions;
         }
         catch (Exception ex)
         {
@@ -382,7 +384,7 @@ public class AuctionService : IAuctionService
         }
     }
 
-    public async Task<Vehicle> MarkVehicleAsSold(int vehicleId, string buyerId)
+    public async Task MarkVehicleAsSold(int vehicleId, string buyerId)
     {
         var vehicle = await _vehicleRepository.GetByIdAsync(vehicleId);
         if (vehicle == null)
@@ -400,7 +402,7 @@ public class AuctionService : IAuctionService
                 $"Active Auction for this vehicle was not found");
         
         await _vehicleRepository.MarkVehicleAsSold(vehicle.Id, buyerId);
-        return vehicle;
+        _logger.LogInformation($"Vehicle {vehicle.Id} marked as sold");
     }
 
     public async Task ProcessCompletedAuctionsAsync()
@@ -452,6 +454,7 @@ public class AuctionService : IAuctionService
                         "Error processing completed auction: {AuctionId}", auction.Id);
                 }
             }
+            _logger.LogInformation($"Finished processing completed auctions");
         }
         catch (Exception ex)
         {
